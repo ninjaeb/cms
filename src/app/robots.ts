@@ -20,6 +20,10 @@ const AI_CRAWLER_USER_AGENTS = [
   "Meta-ExternalAgent",
 ];
 
+// Settings (siteUrl, allowAiCrawlers) are managed live in the admin — never
+// prerender this at build time.
+export const dynamic = "force-dynamic";
+
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const settings = await getSettings();
 

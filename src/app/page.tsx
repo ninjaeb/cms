@@ -4,6 +4,9 @@ import SiteHeader from "@/components/public/SiteHeader";
 import SiteFooter from "@/components/public/SiteFooter";
 import ContentCard from "@/components/public/ContentCard";
 
+// Content is managed live in the admin — never prerender this at build time.
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const settings = await getSettings();
   const items = await prisma.content.findMany({

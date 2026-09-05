@@ -4,6 +4,9 @@ import { parseCitations, parseEntities } from "@/lib/seo";
 
 // A clean, dependency-free markdown mirror of each page for AI crawlers and
 // retrieval pipelines that prefer plain text over parsing rendered HTML.
+// Content is managed live in the admin — never prerender this at build time.
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ slug: string }> },

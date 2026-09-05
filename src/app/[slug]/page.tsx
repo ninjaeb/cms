@@ -14,6 +14,9 @@ import {
 import SiteHeader from "@/components/public/SiteHeader";
 import SiteFooter from "@/components/public/SiteFooter";
 
+// Content is managed live in the admin — never prerender this at build time.
+export const dynamic = "force-dynamic";
+
 async function getContent(slug: string) {
   return prisma.content.findUnique({
     where: { slug },

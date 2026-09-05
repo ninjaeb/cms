@@ -2,6 +2,9 @@ import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { getSettings } from "@/lib/settings";
 
+// Content is managed live in the admin — never prerender this at build time.
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const settings = await getSettings();
   const [content, categories, tags] = await Promise.all([

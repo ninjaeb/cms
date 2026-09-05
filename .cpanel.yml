@@ -1,0 +1,16 @@
+---
+# cPanel Git Version Control deployment tasks.
+# Repository path == the Node.js App's Application Root for this site, so no
+# file copy step is needed — build/deploy commands run in place. Each task
+# line is fully self-contained (sources the nodevenv and cd's into the app
+# root itself) rather than relying on state from earlier lines, since that
+# is not guaranteed across all cPanel versions.
+#
+# Update the paths below if the cPanel username, domain, or Node.js version
+# selected in "Setup Node.js App" ever changes.
+deployment:
+  tasks:
+    - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npm install --include=dev
+    - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npx prisma migrate deploy
+    - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npm run build
+    - mkdir -p /home/gotka7/cms.gotka.com/tmp && touch /home/gotka7/cms.gotka.com/tmp/restart.txt

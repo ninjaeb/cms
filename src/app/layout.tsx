@@ -13,6 +13,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Cascades to every route: settings are read from the database on every
+// request, so nothing in this app should ever be prerendered at build time
+// (the build environment may not even have a database to reach).
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return {

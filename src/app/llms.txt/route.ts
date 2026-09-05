@@ -5,6 +5,9 @@ import { getSettings } from "@/lib/settings";
 // Implements the emerging llms.txt convention (https://llmstxt.org): a
 // plain-markdown index that helps LLMs and AI answer engines discover and
 // correctly cite a site's content without having to crawl and parse full HTML.
+// Content is managed live in the admin — never prerender this at build time.
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const settings = await getSettings();
 
