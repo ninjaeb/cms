@@ -10,9 +10,15 @@
  * existing posts (matched by slug) without duplicating them. Tags and FAQ
  * items are only attached when a post is first created — editing those
  * later is easiest from /admin.
+ *
+ * Also syncs each post to the linked static site (see
+ * src/lib/staticSite/sync.ts) the same way the admin's save action does —
+ * if STATIC_SITE_DIR is set, this writes real static HTML into
+ * public_html/blog/, not just database rows.
  */
 import "dotenv/config";
 import { prisma } from "../src/lib/prisma";
+import { syncContentToStaticSite, regenerateBlogIndex } from "../src/lib/staticSite/sync";
 
 type Faq = { question: string; answer: string };
 type Citation = { label: string; url: string };
@@ -547,12 +553,14 @@ async function main() {
     };
 
     const existing = await prisma.content.findUnique({ where: { slug: post.slug } });
+    let id: string;
 
     if (existing) {
       await prisma.content.update({ where: { slug: post.slug }, data: shared });
+      id = existing.id;
       console.log(`Updated: ${post.slug}`);
     } else {
-      await prisma.content.create({
+      const created = await prisma.content.create({
         data: {
           ...shared,
           slug: post.slug,
@@ -564,9 +572,17 @@ async function main() {
           },
         },
       });
+      id = created.id;
       console.log(`Created: ${post.slug}`);
     }
+
+    // Mirrors what the admin's save action does: write this post to the
+    // linked static site (public_html/blog/{slug}/) if STATIC_SITE_DIR is
+    // configured. A no-op when it isn't set.
+    await syncContentToStaticSite(id);
   }
+
+  await regenerateBlogIndex();
 }
 
 main()
