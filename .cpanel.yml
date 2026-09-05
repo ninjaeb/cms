@@ -28,10 +28,17 @@
 # that file, so without setting it here V8 falls back to an auto-detected
 # heap of only ~30-60MB on this host/container, and `next build` reliably
 # dies with "JavaScript heap out of memory" a few hundred ms in.
+#
+# The build is also retried up to 3 times: this host is shared and its
+# free memory fluctuates, so even the single-worker build (see
+# next.config.ts's experimental.cpus) can occasionally fail an allocation
+# outright during a transient low-memory moment on the host, independent
+# of anything this app controls. A retry has repeatedly resolved this in
+# practice without any other change.
 deployment:
   tasks:
     - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npm ci --include=dev --ignore-scripts
     - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npx prisma generate --schema=/home/gotka7/cms.gotka.com/prisma/schema.prisma
     - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npx prisma migrate deploy --schema=/home/gotka7/cms.gotka.com/prisma/schema.prisma
-    - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && NODE_OPTIONS="--max-old-space-size=2048" npm run build
+    - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && NODE_OPTIONS="--max-old-space-size=2048" npm run build || (source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && NODE_OPTIONS="--max-old-space-size=2048" npm run build) || (source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && NODE_OPTIONS="--max-old-space-size=2048" npm run build)
     - mkdir -p /home/gotka7/cms.gotka.com/tmp && touch /home/gotka7/cms.gotka.com/tmp/restart.txt
