@@ -61,7 +61,7 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
               checked={form.enableAiRecommendations}
               onChange={(e) => update("enableAiRecommendations", e.target.checked)}
             />
-            Enable AI-generated recommendations (requires ANTHROPIC_API_KEY to be set on the
+            Enable AI-generated recommendations (requires GEMINI_API_KEY to be set on the
             server)
           </label>
         </div>

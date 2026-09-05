@@ -64,7 +64,7 @@ export default async function PageScanDetail({
           </p>
         ) : (
           <p className="mt-4 text-sm text-neutral-500">
-            No recommendation generated yet. Requires ANTHROPIC_API_KEY to be set on the server.
+            No recommendation generated yet. Requires GEMINI_API_KEY to be set on the server.
           </p>
         )}
       </div>
