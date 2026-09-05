@@ -4,15 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Settings = {
-  siteName: string;
-  siteDescription: string;
-  siteUrl: string;
-  organizationName: string;
-  organizationLogo: string;
-  defaultOgImage: string;
-  twitterHandle: string;
-  allowAiCrawlers: boolean;
-  llmsTxtIntro: string;
+  scanRootDir: string;
+  enableAiRecommendations: boolean;
 };
 
 export default function SettingsForm({ initial }: { initial: Settings }) {
@@ -49,91 +42,28 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
   return (
     <form onSubmit={onSubmit} className="max-w-2xl space-y-6">
       <div className="rounded-lg border border-neutral-200 bg-white p-5">
-        <h2 className="text-base font-semibold text-neutral-900">Site</h2>
+        <h2 className="text-base font-semibold text-neutral-900">Scan</h2>
         <div className="mt-4 space-y-4">
-          <F label="Site name">
+          <F
+            label="Root directory"
+            hint="Absolute path to the public_html-style directory to scan for HTML files (must be readable by the Node process)."
+          >
             <input
-              value={form.siteName}
-              onChange={(e) => update("siteName", e.target.value)}
-              className="input"
+              value={form.scanRootDir}
+              onChange={(e) => update("scanRootDir", e.target.value)}
+              className="input font-mono text-sm"
+              placeholder="/home/youraccount/public_html"
             />
           </F>
-          <F label="Site description">
-            <textarea
-              value={form.siteDescription}
-              onChange={(e) => update("siteDescription", e.target.value)}
-              rows={2}
-              className="input"
-            />
-          </F>
-          <F label="Site URL" hint="Used for canonical URLs, sitemap, and structured data.">
-            <input
-              value={form.siteUrl}
-              onChange={(e) => update("siteUrl", e.target.value)}
-              className="input"
-            />
-          </F>
-          <F label="Default social share image">
-            <input
-              value={form.defaultOgImage}
-              onChange={(e) => update("defaultOgImage", e.target.value)}
-              className="input"
-            />
-          </F>
-          <F label="Twitter/X handle">
-            <input
-              value={form.twitterHandle}
-              onChange={(e) => update("twitterHandle", e.target.value)}
-              className="input"
-              placeholder="@yoursite"
-            />
-          </F>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-neutral-200 bg-white p-5">
-        <h2 className="text-base font-semibold text-neutral-900">Organization (structured data)</h2>
-        <div className="mt-4 space-y-4">
-          <F label="Organization name">
-            <input
-              value={form.organizationName}
-              onChange={(e) => update("organizationName", e.target.value)}
-              className="input"
-            />
-          </F>
-          <F label="Organization logo URL">
-            <input
-              value={form.organizationLogo}
-              onChange={(e) => update("organizationLogo", e.target.value)}
-              className="input"
-            />
-          </F>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-neutral-200 bg-white p-5">
-        <h2 className="text-base font-semibold text-neutral-900">GEO — AI crawler access</h2>
-        <div className="mt-4 space-y-4">
           <label className="flex items-center gap-2 text-sm text-neutral-700">
             <input
               type="checkbox"
-              checked={form.allowAiCrawlers}
-              onChange={(e) => update("allowAiCrawlers", e.target.checked)}
+              checked={form.enableAiRecommendations}
+              onChange={(e) => update("enableAiRecommendations", e.target.checked)}
             />
-            Allow known AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, …) in
-            robots.txt
+            Enable AI-generated recommendations (requires ANTHROPIC_API_KEY to be set on the
+            server)
           </label>
-          <F
-            label="llms.txt introduction"
-            hint="Shown at the top of /llms.txt, a plain-text index AI systems can use to discover your content."
-          >
-            <textarea
-              value={form.llmsTxtIntro}
-              onChange={(e) => update("llmsTxtIntro", e.target.value)}
-              rows={3}
-              className="input"
-            />
-          </F>
         </div>
       </div>
 

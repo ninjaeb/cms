@@ -16,141 +16,55 @@ enum Role {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
+  id           String   @id @default(cuid())
+  email        String   @unique
   name         String
   passwordHash String
-  role         Role      @default(EDITOR)
-  createdAt    DateTime  @default(now())
-  contents     Content[]
+  role         Role     @default(EDITOR)
+  createdAt    DateTime @default(now())
 }
 
-enum ContentType {
-  POST
-  PAGE
+// One run of scanning `Setting.scanRootDir` (or an overridden path) for
+// static HTML files and scoring each one for SEO/GEO quality.
+model ScanRun {
+  id          String     @id @default(cuid())
+  rootDir     String
+  startedAt   DateTime   @default(now())
+  finishedAt  DateTime?
+  pageCount   Int        @default(0)
+  avgSeoScore Int?
+  avgGeoScore Int?
+  pages       PageScan[]
 }
 
-enum ContentStatus {
-  DRAFT
-  PUBLISHED
-  SCHEDULED
-}
-
-// Core content: powers both blog posts and static pages.
-model Content {
-  id     String        @id @default(cuid())
-  type   ContentType   @default(POST)
-  status ContentStatus @default(DRAFT)
-
-  title   String
-  slug    String
-  excerpt String?
-  body    String // markdown source for POST; raw HTML for PAGE (see staticSite renderers)
-
-  // "en" | "ms" | "zh". A translation of the same page/post shares its slug
-  // with the other locales' rows — [slug, locale] together identify one
-  // piece of content, not slug alone (see staticSite/i18n.ts).
-  locale String @default("en")
-
-  // PAGE only: syncs to the static site's document root ("/") instead of "/<slug>/".
-  isHomepage Boolean @default(false)
-
-  featuredImage String?
-
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  publishedAt DateTime?
-
-  authorId String?
-  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
-
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-
-  tags ContentTag[]
-
-  // --- Traditional SEO fields ---
-  metaTitle       String?
-  metaDescription String?
-  canonicalUrl    String?
-  focusKeyword    String?
-  ogImage         String?
-  noindex         Boolean @default(false)
-  nofollow        Boolean @default(false)
-
-  // --- GEO (Generative Engine Optimization) fields ---
-  // Answer-first summary written for LLM answer engines / AI Overviews.
-  aiSummary         String?
-  // Comma-separated named entities / topics this content is authoritative about.
-  keyEntities       String?
-  // JSON array of {label, url} external sources cited, e.g. [{"label":"NIST","url":"https://..."}].
-  sourceCitations   String?
-  // When the facts in this content were last verified — a freshness/trust signal AI crawlers weigh.
-  lastFactCheckedAt DateTime?
-
-  faqItems FaqItem[]
-
-  @@unique([slug, locale], name: "slug_locale")
-  @@index([status, publishedAt])
-  @@index([type])
-  @@index([locale])
-}
-
-model Category {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String    @unique
-  description String?
-  contents    Content[]
-}
-
-model Tag {
-  id       String       @id @default(cuid())
-  name     String
-  slug     String       @unique
-  contents ContentTag[]
-}
-
-model ContentTag {
-  contentId String
-  tagId     String
-  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([contentId, tagId])
-}
-
-// Q&A pairs per content item, rendered with FAQPage schema and surfaced
-// to AI answer engines that prefer direct question/answer pairs.
-model FaqItem {
+// One HTML file's extracted signals, checklist, and scores from a ScanRun.
+model PageScan {
   id        String  @id @default(cuid())
-  contentId String
-  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  question  String
-  answer    String
-  order     Int     @default(0)
+  scanRunId String
+  scanRun   ScanRun @relation(fields: [scanRunId], references: [id], onDelete: Cascade)
 
-  @@index([contentId])
-}
+  filePath String
+  urlPath  String
+  title    String?
 
-model Redirect {
-  id         String   @id @default(cuid())
-  fromPath   String   @unique
-  toPath     String
-  statusCode Int      @default(301)
-  createdAt  DateTime @default(now())
+  seoScore Int
+  geoScore Int
+
+  // ChecklistItem[] as returned by computeChecklistFromPageSignals.
+  checklist Json
+
+  // Populated lazily when requested from the page detail view, not during
+  // the scan itself, so scans stay fast and don't call the AI on every run.
+  aiRecommendation String?
+
+  scannedAt DateTime @default(now())
+
+  @@index([scanRunId])
 }
 
 // Singleton site-wide configuration row.
 model Setting {
-  id               Int     @id @default(1)
-  siteName         String  @default("My Site")
-  siteDescription  String  @default("")
-  siteUrl          String  @default("http://localhost:3000")
-  organizationName String  @default("")
-  organizationLogo String  @default("")
-  defaultOgImage   String  @default("")
-  twitterHandle    String  @default("")
-  allowAiCrawlers  Boolean @default(true)
-  llmsTxtIntro     String  @default("")
+  id                      Int     @id @default(1)
+  scanRootDir             String  @default("")
+  enableAiRecommendations Boolean @default(false)
 }
