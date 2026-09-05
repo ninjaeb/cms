@@ -21,10 +21,17 @@
 #
 # Update the paths below if the cPanel username, domain, or Node.js version
 # selected in "Setup Node.js App" ever changes.
+#
+# The build step sets NODE_OPTIONS explicitly: an interactive shell on this
+# host has --max-old-space-size=2048 set (likely via ~/.bashrc), giving V8 a
+# ~2.2GB heap. cPanel's non-interactive deploy task runner does not source
+# that file, so without setting it here V8 falls back to an auto-detected
+# heap of only ~30-60MB on this host/container, and `next build` reliably
+# dies with "JavaScript heap out of memory" a few hundred ms in.
 deployment:
   tasks:
     - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npm ci --include=dev --ignore-scripts
     - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npx prisma generate --schema=/home/gotka7/cms.gotka.com/prisma/schema.prisma
     - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npx prisma migrate deploy --schema=/home/gotka7/cms.gotka.com/prisma/schema.prisma
-    - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npm run build
+    - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && NODE_OPTIONS="--max-old-space-size=2048" npm run build
     - mkdir -p /home/gotka7/cms.gotka.com/tmp && touch /home/gotka7/cms.gotka.com/tmp/restart.txt
