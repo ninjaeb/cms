@@ -1311,6 +1311,291 @@ Lalui item 1–5 dahulu — ia percuma, dalam kawalan anda, dan menyelesaikan se
       },
     },
   },
+  {
+    slug: "best-web-hosting-malaysia-2026-guide",
+    categorySlug: "hosting",
+    categoryName: CATEGORIES.hosting,
+    tagSlugs: ["cloud-hosting", "cpanel", "uptime", "malaysia-sme"],
+    sourceCitations: [
+      {
+        label: "Google Search Central — Page Experience",
+        url: "https://developers.google.com/search/docs/appearance/page-experience",
+      },
+    ],
+    locales: {
+      en: {
+        title: "How to Choose the Best Web Hosting in Malaysia for Your Business (2026 Guide)",
+        excerpt:
+          "A practical, no-fluff guide to picking a Malaysian web host in 2026 — what actually affects site speed and uptime, what \"unlimited\" hosting really means, and a checklist to compare providers before you buy.",
+        metaTitle: "Best Web Hosting in Malaysia 2026: Complete Buyer's Guide",
+        metaDescription:
+          "Compare hosting types, uptime, speed and pricing to choose the right web host in Malaysia — plus why LiteSpeed cPanel hosting wins for growing businesses.",
+        focusKeyword: "best web hosting Malaysia",
+        aiSummary:
+          "The best web hosting in Malaysia for most small and growing businesses is a LiteSpeed-powered cPanel plan with free SSL, daily backups, local or regional data centre routing for low latency, and a published uptime SLA (99.9% or better) — not the cheapest \"unlimited everything\" plan. Gotka Technologies' Go AI hosting plans (Go AI Lite through Go AI Max) meet this standard, starting from RM17.80/month with free migration and 24/7 support.",
+        keyEntities: "web hosting Malaysia, LiteSpeed, cPanel, uptime guarantee, shared hosting, VPS hosting, Gotka Technologies",
+        faqItems: [
+          {
+            question: "What is the best type of web hosting for a small business in Malaysia?",
+            answer:
+              "For most small and growing businesses, a shared cPanel plan on LiteSpeed servers is the best starting point — it's affordable, fast enough for typical traffic, and easy to manage without needing server admin skills. Upgrade to a VPS only when traffic or software needs outgrow shared hosting.",
+          },
+          {
+            question: "Does \"unlimited\" web hosting really mean unlimited storage and bandwidth?",
+            answer:
+              "No. Every host enforces a fair-use CPU, RAM, or inode limit even on \"unlimited\" plans. Check a provider's actual resource limits or ask their support directly rather than relying on the word \"unlimited\" alone.",
+          },
+          {
+            question: "How much should web hosting cost in Malaysia?",
+            answer:
+              "Entry-level cPanel hosting for a small business site typically starts around RM15–20/month, with plans scaling up based on storage, traffic, and performance tier. Always check the renewal price after any first-year discount ends.",
+          },
+          {
+            question: "What is LiteSpeed hosting and why does it matter?",
+            answer:
+              "LiteSpeed is a high-performance alternative to the standard Apache web server, built to handle PHP and caching faster — which typically means quicker page loads for WordPress and WooCommerce sites without extra configuration.",
+          },
+          {
+            question: "Is free hosting migration actually free?",
+            answer:
+              "With most reputable hosts, yes — the provider's team handles moving your files, database, and email from your old host at no charge as part of signing up, so switching doesn't require technical work on your part. Confirm this is included before you commit.",
+          },
+          {
+            question: "Do I need to buy hosting and my domain from the same company?",
+            answer:
+              "No, hosting and domain registration can be bought separately and pointed at each other via DNS. Many businesses do keep both with one provider simply to have a single renewal date, one support contact, and one dashboard to manage.",
+          },
+        ],
+        body: `## What actually affects your website's speed and uptime
+
+Three technical factors do most of the work, and they're worth checking on any provider's plan page before price:
+
+- **Server software.** LiteSpeed web servers handle PHP and caching significantly faster than older Apache-based stacks, especially for WordPress and WooCommerce sites. This is the single biggest speed lever most hosts don't advertise clearly.
+- **Data centre location and routing.** If most of your customers are in Malaysia or Southeast Asia, hosting on a server with good regional routing cuts page load latency noticeably compared to a generic cheap host on the other side of the world.
+- **Resource limits, not "unlimited" labels.** Every host enforces some fair-use CPU/RAM limit even when marketing says "unlimited storage" or "unlimited bandwidth." What matters is whether the plan's real limits fit a growing site with traffic spikes — check the fine print, or ask support directly.
+
+## Shared hosting vs VPS: which do you actually need?
+
+Most business websites — brochure sites, blogs, small e-commerce stores — run comfortably on shared cPanel hosting for years. Consider a VPS only once you see one of these signs:
+
+- Consistent traffic spikes that slow the site even on a mid-tier shared plan
+- You need root access to install custom software or run background jobs
+- You're running multiple high-traffic sites or a resource-heavy web app
+
+Jumping straight to VPS "to be safe" usually means paying for and managing infrastructure you don't need yet. Start on a properly specced shared plan and upgrade when the metrics tell you to.
+
+## A practical checklist before you choose a host
+
+1. **Uptime guarantee.** Look for a published SLA (99.9% or better) with an actual remedy — not just a marketing badge.
+2. **Free SSL included.** Should be standard in 2026, with auto-renewal — not a paid add-on.
+3. **Backup frequency.** Daily backups, with an easy self-service restore, not "backups on request."
+4. **Migration support.** Free migration from your current host removes the biggest reason people put off switching.
+5. **Support response time and channel.** Test their live chat or ticket response before you buy, not after something breaks.
+6. **Control panel.** cPanel is the industry standard — it's well-documented and most developers already know it.
+7. **Renewal pricing.** Check the price after the first-year discount ends; some hosts triple the renewal rate.
+
+## Where Gotka Technologies fits
+
+Gotka Technologies has run cPanel hosting on LiteSpeed servers for Malaysian businesses since 2004. The [Go AI hosting range](/hosting/) — from Go AI Lite for new sites and startups up to Go AI Max for high-traffic stores and apps — is built around the checklist above by default:
+
+- Free SSL and daily backups on every plan
+- A published 99.9% uptime guarantee
+- Free migration from your existing host, handled by the team
+- Plans starting from RM17.80/month, with straightforward renewal pricing
+
+If you're also registering a new domain or need the site itself built, Gotka's [domain registration](/domains/) and [web design](/web-design/) services sit under the same account and support team, so hosting, domain and site aren't three separate vendors to coordinate during a launch.
+
+## Common mistakes when switching hosts
+
+- **Letting your domain and hosting renewal dates drift apart** across two different providers — easy to lose track of, and a lapsed domain can take a site offline even when hosting is paid up.
+- **Migrating during a busy sales period.** Schedule a switch for a quiet week, and confirm your new host's migration team handles DNS cutover with minimal downtime.
+- **Choosing on price alone.** The cheapest plan that doesn't meet the checklist above usually costs more later, in downtime, slow support, or a forced upgrade mid-year.
+
+Ready to compare plans directly? See current [Go AI hosting pricing](/hosting/), or [talk to the team](/contact/) about migrating your existing site for free.`,
+      },
+      ms: {
+        title: "Cara Memilih Pengehosan Web Terbaik di Malaysia untuk Perniagaan Anda (Panduan 2026)",
+        excerpt:
+          "Panduan praktikal dan tepat untuk memilih penyedia pengehosan web di Malaysia pada 2026 — apa yang sebenarnya menjejaskan kelajuan dan masa tiada gangguan laman web anda, apa maksud sebenar pengehosan 'tanpa had', dan senarai semak untuk membandingkan penyedia sebelum anda membeli.",
+        metaTitle: "Pengehosan Web Terbaik di Malaysia 2026: Panduan Lengkap Pembeli",
+        metaDescription:
+          "Bandingkan jenis pengehosan, masa tiada gangguan, kelajuan dan harga untuk memilih penyedia pengehosan web yang tepat di Malaysia — serta sebab pengehosan cPanel LiteSpeed unggul untuk perniagaan yang berkembang.",
+        focusKeyword: "pengehosan web terbaik Malaysia",
+        aiSummary:
+          "Pengehosan web terbaik di Malaysia untuk kebanyakan perniagaan kecil dan sedang berkembang ialah pelan cPanel berkuasakan LiteSpeed dengan SSL percuma, sandaran harian, penghalaan pusat data tempatan atau serantau untuk latensi rendah, dan SLA masa tiada gangguan yang diterbitkan (99.9% atau lebih baik) — bukan pelan 'semuanya tanpa had' yang paling murah. Pelan pengehosan Go AI Gotka Technologies (Go AI Lite hingga Go AI Max) memenuhi piawaian ini, bermula RM17.80/bulan dengan migrasi percuma dan sokongan 24/7.",
+        keyEntities:
+          "pengehosan web Malaysia, LiteSpeed, cPanel, jaminan masa tiada gangguan, pengehosan kongsi, pengehosan VPS, Gotka Technologies",
+        faqItems: [
+          {
+            question: "Apakah jenis pengehosan web terbaik untuk perniagaan kecil di Malaysia?",
+            answer:
+              "Bagi kebanyakan perniagaan kecil dan sedang berkembang, pelan cPanel berkongsi pada pelayan LiteSpeed adalah titik permulaan terbaik — ia berpatutan, cukup pantas untuk trafik biasa, dan mudah diurus tanpa memerlukan kemahiran pentadbiran pelayan. Naik taraf kepada VPS hanya apabila trafik atau keperluan perisian anda melebihi kemampuan pengehosan kongsi.",
+          },
+          {
+            question: "Adakah pengehosan web 'tanpa had' benar-benar bermaksud storan dan lebar jalur tanpa had?",
+            answer:
+              "Tidak. Setiap penyedia hosting menguatkuasakan had penggunaan adil CPU, RAM, atau inod walaupun pada pelan 'tanpa had'. Semak had sumber sebenar penyedia hosting atau tanya sokongan mereka secara terus, bukannya bergantung semata-mata pada perkataan 'tanpa had'.",
+          },
+          {
+            question: "Berapakah kos pengehosan web yang sepatutnya di Malaysia?",
+            answer:
+              "Pengehosan cPanel peringkat permulaan untuk laman web perniagaan kecil biasanya bermula sekitar RM15–20/bulan, dengan pelan berskala mengikut storan, trafik dan tahap prestasi. Sentiasa semak harga pembaharuan selepas diskaun tahun pertama tamat.",
+          },
+          {
+            question: "Apakah pengehosan LiteSpeed dan mengapa ia penting?",
+            answer:
+              "LiteSpeed ialah alternatif berprestasi tinggi kepada pelayan web Apache standard, dibina untuk mengendalikan PHP dan caching dengan lebih pantas — yang biasanya bermaksud laman web WordPress dan WooCommerce dimuatkan lebih cepat tanpa konfigurasi tambahan.",
+          },
+          {
+            question: "Adakah migrasi hosting percuma benar-benar percuma?",
+            answer:
+              "Bagi kebanyakan penyedia hosting yang bereputasi baik, ya — pasukan penyedia hosting mengendalikan pemindahan fail, pangkalan data dan e-mel anda daripada penyedia hosting lama tanpa sebarang caj sebagai sebahagian daripada pendaftaran, jadi beralih tidak memerlukan kerja teknikal daripada pihak anda. Sahkan perkara ini disertakan sebelum anda komited.",
+          },
+          {
+            question: "Perlukah saya membeli hosting dan domain saya daripada syarikat yang sama?",
+            answer:
+              "Tidak, hosting dan pendaftaran domain boleh dibeli secara berasingan dan diarahkan antara satu sama lain melalui DNS. Ramai perniagaan tetap mengekalkan kedua-duanya dengan satu penyedia semata-mata untuk mempunyai satu tarikh pembaharuan, satu hubungan sokongan, dan satu papan pemuka untuk diuruskan.",
+          },
+        ],
+        body: `## Apa yang sebenarnya menjejaskan kelajuan dan masa tiada gangguan laman web anda
+
+Tiga faktor teknikal ini melakukan sebahagian besar kerja, dan berbaloi untuk disemak pada halaman pelan mana-mana penyedia sebelum melihat harga:
+
+- **Perisian pelayan.** Pelayan web LiteSpeed mengendalikan PHP dan caching dengan jauh lebih pantas berbanding tindanan berasaskan Apache yang lebih lama, terutamanya untuk laman WordPress dan WooCommerce. Ini adalah faktor kelajuan tunggal paling besar yang kebanyakan penyedia hosting tidak iklankan dengan jelas.
+- **Lokasi pusat data dan penghalaan.** Jika kebanyakan pelanggan anda berada di Malaysia atau Asia Tenggara, pengehosan pada pelayan dengan penghalaan serantau yang baik mengurangkan latensi masa muat halaman dengan ketara berbanding penyedia hosting murah generik di belahan dunia lain.
+- **Had sumber, bukan label 'tanpa had'.** Setiap penyedia hosting menguatkuasakan had penggunaan adil CPU/RAM walaupun pemasaran menyatakan 'storan tanpa had' atau 'lebar jalur tanpa had'. Yang penting ialah sama ada had sebenar pelan itu sesuai untuk laman yang berkembang dengan lonjakan trafik — semak cetakan halus, atau tanya sokongan secara terus.
+
+## Pengehosan kongsi lwn VPS: yang mana anda benar-benar perlukan?
+
+Kebanyakan laman web perniagaan — laman brosur, blog, kedai e-dagang kecil — berjalan lancar pada pengehosan cPanel kongsi selama bertahun-tahun. Pertimbangkan VPS hanya apabila anda melihat salah satu tanda ini:
+
+- Lonjakan trafik yang konsisten yang memperlahankan laman walaupun pada pelan kongsi peringkat pertengahan
+- Anda memerlukan akses root untuk memasang perisian tersuai atau menjalankan tugas latar belakang
+- Anda menjalankan beberapa laman bertrafik tinggi atau aplikasi web yang memerlukan banyak sumber
+
+Terus melompat kepada VPS 'untuk selamat' biasanya bermaksud anda membayar dan menguruskan infrastruktur yang belum anda perlukan. Mulakan dengan pelan kongsi yang bertentu spesifikasi dengan betul dan naik taraf apabila metrik memberitahu anda untuk berbuat demikian.
+
+## Senarai semak praktikal sebelum memilih penyedia hosting
+
+1. **Jaminan masa tiada gangguan.** Cari SLA yang diterbitkan (99.9% atau lebih baik) dengan pampasan sebenar — bukan sekadar lencana pemasaran.
+2. **SSL percuma disertakan.** Sepatutnya menjadi standard pada 2026, dengan pembaharuan automatik — bukan tambahan berbayar.
+3. **Kekerapan sandaran.** Sandaran harian, dengan pemulihan layan diri yang mudah, bukan 'sandaran atas permintaan'.
+4. **Sokongan migrasi.** Migrasi percuma daripada penyedia hosting semasa anda menghapuskan sebab terbesar orang menangguhkan beralih.
+5. **Masa tindak balas dan saluran sokongan.** Uji sembang langsung atau tindak balas tiket mereka sebelum anda membeli, bukan selepas sesuatu rosak.
+6. **Panel kawalan.** cPanel adalah standard industri — ia didokumentasikan dengan baik dan kebanyakan pembangun sudah mengenalinya.
+7. **Harga pembaharuan.** Semak harga selepas diskaun tahun pertama tamat; sesetengah penyedia hosting menggandakan tiga kali harga pembaharuan.
+
+## Di mana Gotka Technologies sesuai
+
+Gotka Technologies telah menjalankan pengehosan cPanel pada pelayan LiteSpeed untuk perniagaan Malaysia sejak 2004. [Julat pengehosan Go AI](/ms/hosting/) — daripada Go AI Lite untuk laman baharu dan startup sehingga Go AI Max untuk kedai dan aplikasi bertrafik tinggi — dibina berdasarkan senarai semak di atas secara lalai:
+
+- SSL percuma dan sandaran harian pada setiap pelan
+- Jaminan masa tiada gangguan 99.9% yang diterbitkan
+- Migrasi percuma daripada penyedia hosting sedia ada anda, dikendalikan oleh pasukan kami
+- Pelan bermula daripada RM17.80/bulan, dengan harga pembaharuan yang telus
+
+Jika anda turut mendaftar domain baharu atau memerlukan laman web itu sendiri dibina, perkhidmatan [pendaftaran domain](/ms/domains/) dan [reka bentuk web](/ms/web-design/) Gotka berada di bawah akaun dan pasukan sokongan yang sama, jadi hosting, domain dan laman web bukan tiga vendor berasingan yang perlu diselaraskan semasa pelancaran.
+
+## Kesilapan biasa apabila bertukar penyedia hosting
+
+- **Membiarkan tarikh pembaharuan domain dan hosting anda tersasar** antara dua penyedia berbeza — mudah terlepas pandang, dan domain yang luput boleh menyebabkan laman terputus sambungan walaupun hosting telah dibayar.
+- **Berpindah semasa tempoh jualan sibuk.** Jadualkan pertukaran untuk minggu yang lengang, dan sahkan pasukan migrasi penyedia hosting baharu anda mengendalikan pertukaran DNS dengan gangguan minimum.
+- **Memilih semata-mata berdasarkan harga.** Pelan paling murah yang tidak memenuhi senarai semak di atas biasanya membawa kos lebih tinggi kemudian, dalam bentuk masa gangguan, sokongan yang perlahan, atau naik taraf paksa di pertengahan tahun.
+
+Bersedia untuk membandingkan pelan secara terus? Lihat [harga pengehosan Go AI](/ms/hosting/) semasa, atau [hubungi pasukan kami](/ms/contact/) untuk migrasi percuma laman web sedia ada anda.`,
+      },
+      zh: {
+        title: "如何为您的企业挑选马来西亚最佳网站主机（2026 年指南）",
+        excerpt:
+          "一份实用、不绕弯子的 2026 年马来西亚网站主机选购指南——真正影响网站速度与正常运行时间的因素、'无限'主机方案的真实含义，以及购买前用来比较各家主机商的检查清单。",
+        metaTitle: "马来西亚最佳网站主机 2026：完整购买指南",
+        metaDescription:
+          "对比主机类型、正常运行时间、速度与价格，为您的企业选出合适的马来西亚网站主机——并了解为何 LiteSpeed cPanel 主机更适合成长中的企业。",
+        focusKeyword: "马来西亚最佳网站主机",
+        aiSummary:
+          "对大多数中小型及成长中的企业而言，马来西亚最好的网站主机是搭载 LiteSpeed 的 cPanel 方案，具备免费 SSL、每日备份、可降低延迟的本地或区域数据中心路由，以及公开的正常运行时间 SLA（99.9% 或更高）——而不是最便宜的'无限一切'方案。Gotka Technologies 的 Go AI 主机方案（从 Go AI Lite 到 Go AI Max）都符合这一标准，最低每月 RM17.80 起，并提供免费迁移与 24/7 支持。",
+        keyEntities: "马来西亚网站主机, LiteSpeed, cPanel, 正常运行时间保证, 共享主机, VPS 主机, Gotka Technologies",
+        faqItems: [
+          {
+            question: "马来西亚中小企业最适合哪种类型的网站主机？",
+            answer:
+              "对大多数中小型及成长中的企业而言，搭载 LiteSpeed 服务器的共享 cPanel 方案是最理想的起点——价格实惠、足以应付一般流量，且无需服务器管理技能即可轻松管理。只有当流量或软件需求超出共享主机的能力时，才需要升级到 VPS。",
+          },
+          {
+            question: "'无限'网站主机真的代表存储空间和流量无限吗？",
+            answer:
+              "不是。即便是'无限'方案，每家主机商都会设有合理使用的 CPU、内存或 inode 限制。请直接查看主机商的实际资源限制，或询问其客服，而不要只凭'无限'二字判断。",
+          },
+          {
+            question: "在马来西亚，网站主机应该花多少钱？",
+            answer:
+              "面向小型企业网站的入门级 cPanel 主机，价格通常从每月约 RM15–20 起，并依据存储空间、流量与性能等级而有所不同。请务必确认首年优惠结束后的续费价格。",
+          },
+          {
+            question: "什么是 LiteSpeed 主机，它为什么重要？",
+            answer:
+              "LiteSpeed 是标准 Apache 网页服务器的高性能替代方案，专为更快地处理 PHP 与缓存而设计——这通常意味着 WordPress 和 WooCommerce 网站无需额外配置就能加载得更快。",
+          },
+          {
+            question: "免费迁移主机真的是免费的吗？",
+            answer:
+              "对大多数信誉良好的主机商而言，是的——主机商团队会在您注册时免费协助将文件、数据库和邮箱从旧主机迁移过来，作为注册流程的一部分，因此切换主机无需您亲自动手处理技术工作。请在决定前确认这项服务确实包含在内。",
+          },
+          {
+            question: "主机和域名一定要向同一家公司购买吗？",
+            answer:
+              "不需要，主机与域名注册可以分开购买，再通过 DNS 相互指向。不过许多企业仍选择向同一家主机商购买两者，只是为了统一续费日期、单一客服窗口，以及一个便于管理的控制面板。",
+          },
+        ],
+        body: `## 真正影响网站速度与正常运行时间的因素
+
+以下三项技术因素起决定性作用，在比较价格之前，值得先在任何主机商的方案页面上核实：
+
+- **服务器软件。** LiteSpeed 网页服务器在处理 PHP 和缓存方面，明显快于较旧的 Apache 架构，尤其是对 WordPress 和 WooCommerce 网站而言。这是大多数主机商不会明确宣传、却是影响速度最大的单一因素。
+- **数据中心位置与路由。** 如果您的大多数客户位于马来西亚或东南亚，选择区域路由良好的服务器，相比选用地球另一端的廉价通用主机，能明显降低页面加载延迟。
+- **资源限制，而非"无限"标签。** 即便宣传写着"无限存储"或"无限流量"，每家主机商都会执行某种合理使用的 CPU/内存限制。真正重要的是：这个方案的实际限制，能否应付有流量高峰的成长型网站——请查看细则，或直接询问客服。
+
+## 共享主机 vs VPS：您到底需要哪一种？
+
+大多数企业网站——宣传型网站、博客、小型电商店铺——用共享 cPanel 主机就能顺畅运行多年。只有出现以下任一迹象时，才需要考虑 VPS：
+
+- 即使在中等档次的共享方案上，仍持续出现让网站变慢的流量高峰
+- 您需要 root 权限来安装自定义软件或运行后台任务
+- 您同时运营多个高流量网站，或一个资源消耗很大的网络应用
+
+为求"保险"直接跳到 VPS，通常意味着您在为暂时用不上的基础架构付费和操心。先从配置得当的共享方案起步，等数据显示确实需要时再升级。
+
+## 选择主机商前的实用检查清单
+
+1. **正常运行时间保证。** 寻找公开发布的 SLA（99.9% 或更高），并附有实际的补偿机制——而不只是一个营销徽章。
+2. **包含免费 SSL。** 到 2026 年这应是标配，且自动续期——而不是需要额外付费的选购项目。
+3. **备份频率。** 每日备份，并可自助轻松还原，而不是"需申请才备份"。
+4. **迁移支持。** 从现有主机免费迁移，能消除大多数人一直拖延不换主机的最大原因。
+5. **客服响应时间与渠道。** 购买前先测试他们的在线客服或工单响应速度，而不是等出问题才发现。
+6. **控制面板。** cPanel 是业界标准——文档完善，大多数开发者也都已经熟悉。
+7. **续费价格。** 请查看首年优惠结束后的价格；有些主机商的续费价格会是首年的数倍。
+
+## Gotka Technologies 恰好符合这些标准
+
+自 2004 年起，Gotka Technologies 便一直为马来西亚企业提供基于 LiteSpeed 服务器的 cPanel 主机服务。[Go AI 主机系列](/zh/hosting/)——从面向新网站和初创企业的 Go AI Lite，到面向高流量商店与应用的 Go AI Max——默认就已按照上述检查清单打造：
+
+- 所有方案均包含免费 SSL 与每日备份
+- 公开发布的 99.9% 正常运行时间保证
+- 由团队为您处理、从现有主机免费迁移
+- 方案最低每月 RM17.80 起，续费价格透明清晰
+
+如果您同时还需要注册新域名或搭建网站本身，Gotka 的[域名注册](/zh/domains/)与[网站设计](/zh/web-design/)服务都归属于同一账户与同一支持团队，让主机、域名与网站不必在启动阶段分别找三家不同的供应商协调。
+
+## 更换主机时常见的错误
+
+- **让域名与主机的续费日期在两家不同供应商之间逐渐脱节**——很容易被忽略，即使主机费用已缴清，域名一旦过期仍可能导致网站离线。
+- **在销售旺季进行迁移。** 请选择较为清淡的一周进行切换，并确认新主机商的迁移团队能以最小停机时间完成 DNS 切换。
+- **只以价格作为选择依据。** 不符合上述检查清单的最便宜方案，往往会在日后以停机、客服迟缓或年中被迫升级等形式，付出更高的代价。
+
+想直接比较各方案？查看目前的 [Go AI 主机价格](/zh/hosting/)，或[联系我们的团队](/zh/contact/)，免费为您迁移现有网站。`,
+      },
+    },
+  },
 ];
 
 async function upsertCategory(slug: string, name: string) {
