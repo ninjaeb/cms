@@ -21,6 +21,7 @@ export const contentSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
   excerpt: z.string().max(500).nullable().optional(),
   body: z.string().min(1),
+  isHomepage: z.boolean().default(false),
   featuredImage: z.string().url().nullable().optional().or(z.literal("")),
   publishedAt: z.string().nullable().optional(),
   categoryId: z.string().nullable().optional(),

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { contentSchema } from "@/lib/validation";
+import { removeContentFromStaticSite, syncContentToStaticSite, regenerateBlogIndex } from "@/lib/staticSite/sync";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -42,6 +43,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         slug: data.slug,
         excerpt: data.excerpt || null,
         body: data.body,
+        isHomepage: data.isHomepage,
         featuredImage: data.featuredImage || null,
         publishedAt,
         categoryId: data.categoryId || null,
@@ -70,6 +72,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }),
   ]);
 
+  // If the slug, type, or homepage flag changed, the old static file lives at
+  // a different path than the new one will — remove it so it doesn't linger.
+  if (
+    data.slug !== existing.slug ||
+    data.type !== existing.type ||
+    data.isHomepage !== existing.isHomepage
+  ) {
+    await removeContentFromStaticSite(existing);
+    if (existing.type === "POST") await regenerateBlogIndex();
+  }
+  await syncContentToStaticSite(id);
+
   return NextResponse.json({ id, slug: data.slug });
 }
 
@@ -77,6 +91,14 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
+
+  const existing = await prisma.content.findUnique({ where: { id } });
   await prisma.content.delete({ where: { id } }).catch(() => null);
+
+  if (existing) {
+    await removeContentFromStaticSite(existing);
+    if (existing.type === "POST") await regenerateBlogIndex();
+  }
+
   return NextResponse.json({ ok: true });
 }

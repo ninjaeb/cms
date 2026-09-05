@@ -15,6 +15,7 @@ export type ContentFormInitial = {
   slug: string;
   excerpt: string;
   body: string;
+  isHomepage: boolean;
   featuredImage: string;
   categoryId: string;
   tagIds: string[];
@@ -39,6 +40,7 @@ const EMPTY: ContentFormInitial = {
   slug: "",
   excerpt: "",
   body: "",
+  isHomepage: false,
   featuredImage: "",
   categoryId: "",
   tagIds: [],
@@ -154,6 +156,7 @@ export default function ContentForm({
       slug: form.slug,
       excerpt: form.excerpt || null,
       body: form.body,
+      isHomepage: form.isHomepage,
       featuredImage: form.featuredImage || null,
       categoryId: form.categoryId || null,
       tagIds: form.tagIds,
@@ -229,7 +232,14 @@ export default function ContentForm({
               className="input"
             />
           </Field>
-          <Field label="Body (Markdown)">
+          <Field
+            label={form.type === "PAGE" ? "Body (Raw HTML)" : "Body (Markdown)"}
+            hint={
+              form.type === "PAGE"
+                ? "Inserted directly into the static page's <main> — write full HTML (sections, divs, etc.), not Markdown. Used for the linked static site sync (see Publish panel)."
+                : undefined
+            }
+          >
             <textarea
               required
               value={form.body}
@@ -420,6 +430,22 @@ export default function ContentForm({
               <option value="PAGE">Page</option>
             </select>
           </Field>
+          {form.type === "PAGE" && (
+            <label className="flex items-start gap-2 text-sm text-neutral-700">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={form.isHomepage}
+                onChange={(e) => update("isHomepage", e.target.checked)}
+              />
+              <span>
+                This is the homepage
+                <span className="block text-xs text-neutral-400">
+                  Syncs to the static site&apos;s document root (/) instead of /slug/.
+                </span>
+              </span>
+            </label>
+          )}
           <Field label="Status">
             <select
               value={form.status}
