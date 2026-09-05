@@ -1,8 +1,8 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import type { ChecklistItem } from "./seo";
 import type { PageSignals } from "./htmlScan";
 
-const client = new Anthropic();
+const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 /**
  * Generates concrete, page-specific SEO/GEO improvement suggestions from a
@@ -38,12 +38,10 @@ ${failed.map((item) => `- ${item.label}: ${item.hint}`).join("\n")}
 
 Write a short, specific recommendation for each failed check.`;
 
-  const response = await client.messages.create({
-    model: "claude-opus-5",
-    max_tokens: 1024,
-    messages: [{ role: "user", content: prompt }],
+  const response = await client.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
   });
 
-  const textBlock = response.content.find((block) => block.type === "text");
-  return textBlock && "text" in textBlock ? textBlock.text : "";
+  return response.text ?? "";
 }

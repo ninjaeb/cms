@@ -23,7 +23,7 @@ Built with Next.js (App Router), Prisma + PostgreSQL, and Tailwind CSS.
   score.
 - **Recommend** fixes for failing checks: the checklist hints are rule-based
   and instant; a per-page "Generate recommendation" button additionally
-  calls Claude for specific, page-referencing suggestions
+  calls Gemini for specific, page-referencing suggestions
   (`src/lib/aiRecommend.ts`).
 - Scan history is persisted (`ScanRun`/`PageScan` models) so past scans stay
   browsable.
@@ -34,7 +34,7 @@ Requires a running PostgreSQL server (local, Docker, or hosted).
 
 ```bash
 npm install
-cp .env.example .env      # then edit DATABASE_URL, AUTH_SECRET, ANTHROPIC_API_KEY
+cp .env.example .env      # then edit DATABASE_URL, AUTH_SECRET, GEMINI_API_KEY
 
 # create the database, e.g.:
 #   createdb cms_dev
@@ -50,7 +50,7 @@ script, default `admin@example.com` / `changeme123` — change
 **Settings**, set the root directory to scan (e.g. `/home/youruser/public_html`)
 and run a scan from the **Scan** page.
 
-AI-generated recommendations require `ANTHROPIC_API_KEY` to be set; without
+AI-generated recommendations require `GEMINI_API_KEY` to be set; without
 it, the rule-based checklist still works, but the "Generate recommendation"
 button will fail.
 
@@ -62,7 +62,7 @@ button will fail.
   normalized signals shape
 - `src/lib/seo.ts` — the SEO/GEO checklist scoring logic
   (`computeChecklistFromPageSignals`)
-- `src/lib/aiRecommend.ts` — calls Claude for page-specific recommendations
+- `src/lib/aiRecommend.ts` — calls Gemini for page-specific recommendations
 - `src/app/admin/**` — the admin UI (dashboard, scan runs, settings),
   protected by `src/proxy.ts`
 - `src/app/api/scan/**` — triggers scans, lists runs, generates
@@ -89,7 +89,7 @@ Prerequisites, done once in cPanel:
    instead):
    - `DATABASE_URL` = `postgresql://gotka7_dbuser:PASSWORD@localhost:5432/gotka7_dbname?schema=public`
    - `AUTH_SECRET` — a real random secret (`openssl rand -base64 32`)
-   - `ANTHROPIC_API_KEY` — required for AI-generated recommendations
+   - `GEMINI_API_KEY` — required for AI-generated recommendations
    - `NODE_ENV` = `production`
 4. The first deploy, run once via the Node.js App's "Run NPM Install" or an
    SSH session with the nodevenv activated: `npx tsx prisma/seed.ts` (or set
