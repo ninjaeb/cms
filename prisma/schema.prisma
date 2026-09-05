@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         Role      @default(EDITOR)
+  createdAt    DateTime  @default(now())
+  contents     Content[]
+}
+
+enum ContentType {
+  POST
+  PAGE
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+}
+
+// Core content: powers both blog posts and static pages.
+model Content {
+  id     String        @id @default(cuid())
+  type   ContentType   @default(POST)
+  status ContentStatus @default(DRAFT)
+
+  title   String
+  slug    String  @unique
+  excerpt String?
+  body    String // markdown source
+
+  featuredImage String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  tags ContentTag[]
+
+  // --- Traditional SEO fields ---
+  metaTitle       String?
+  metaDescription String?
+  canonicalUrl    String?
+  focusKeyword    String?
+  ogImage         String?
+  noindex         Boolean @default(false)
+  nofollow        Boolean @default(false)
+
+  // --- GEO (Generative Engine Optimization) fields ---
+  // Answer-first summary written for LLM answer engines / AI Overviews.
+  aiSummary         String?
+  // Comma-separated named entities / topics this content is authoritative about.
+  keyEntities       String?
+  // JSON array of {label, url} external sources cited, e.g. [{"label":"NIST","url":"https://..."}].
+  sourceCitations   String?
+  // When the facts in this content were last verified — a freshness/trust signal AI crawlers weigh.
+  lastFactCheckedAt DateTime?
+
+  faqItems FaqItem[]
+
+  @@index([status, publishedAt])
+  @@index([type])
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  contents    Content[]
+}
+
+model Tag {
+  id       String       @id @default(cuid())
+  name     String
+  slug     String       @unique
+  contents ContentTag[]
+}
+
+model ContentTag {
+  contentId String
+  tagId     String
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([contentId, tagId])
+}
+
+// Q&A pairs per content item, rendered with FAQPage schema and surfaced
+// to AI answer engines that prefer direct question/answer pairs.
+model FaqItem {
+  id        String  @id @default(cuid())
+  contentId String
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  question  String
+  answer    String
+  order     Int     @default(0)
+
+  @@index([contentId])
+}
+
+model Redirect {
+  id         String   @id @default(cuid())
+  fromPath   String   @unique
+  toPath     String
+  statusCode Int      @default(301)
+  createdAt  DateTime @default(now())
+}
+
+// Singleton site-wide configuration row.
+model Setting {
+  id               Int     @id @default(1)
+  siteName         String  @default("My Site")
+  siteDescription  String  @default("")
+  siteUrl          String  @default("http://localhost:3000")
+  organizationName String  @default("")
+  organizationLogo String  @default("")
+  defaultOgImage   String  @default("")
+  twitterHandle    String  @default("")
+  allowAiCrawlers  Boolean @default(true)
+  llmsTxtIntro     String  @default("")
+}
