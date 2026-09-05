@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { contentSchema } from "@/lib/validation";
 import { removeContentFromStaticSite, syncContentToStaticSite, regenerateBlogIndex } from "@/lib/staticSite/sync";
+import { normalizeLocale } from "@/lib/staticSite/i18n";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -19,9 +20,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const existing = await prisma.content.findUnique({ where: { id } });
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  if (data.slug !== existing.slug) {
-    const slugTaken = await prisma.content.findUnique({ where: { slug: data.slug } });
-    if (slugTaken) return NextResponse.json({ error: "Slug is already in use." }, { status: 409 });
+  if (data.slug !== existing.slug || data.locale !== existing.locale) {
+    const slugTaken = await prisma.content.findUnique({
+      where: { slug_locale: { slug: data.slug, locale: data.locale } },
+    });
+    if (slugTaken) return NextResponse.json({ error: "Slug is already in use for this language." }, { status: 409 });
   }
 
   const publishedAt =
@@ -39,6 +42,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       data: {
         type: data.type,
         status: data.status,
+        locale: data.locale,
         title: data.title,
         slug: data.slug,
         excerpt: data.excerpt || null,
@@ -72,15 +76,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }),
   ]);
 
-  // If the slug, type, or homepage flag changed, the old static file lives at
-  // a different path than the new one will — remove it so it doesn't linger.
+  // If the slug, locale, type, or homepage flag changed, the old static file
+  // lives at a different path than the new one will — remove it so it
+  // doesn't linger.
   if (
     data.slug !== existing.slug ||
+    data.locale !== existing.locale ||
     data.type !== existing.type ||
     data.isHomepage !== existing.isHomepage
   ) {
     await removeContentFromStaticSite(existing);
-    if (existing.type === "POST") await regenerateBlogIndex();
+    if (existing.type === "POST") await regenerateBlogIndex(normalizeLocale(existing.locale));
   }
   await syncContentToStaticSite(id);
 
@@ -97,7 +103,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   if (existing) {
     await removeContentFromStaticSite(existing);
-    if (existing.type === "POST") await regenerateBlogIndex();
+    if (existing.type === "POST") await regenerateBlogIndex(normalizeLocale(existing.locale));
   }
 
   return NextResponse.json({ ok: true });

@@ -3,7 +3,8 @@ import path from "path";
 import { prisma } from "@/lib/prisma";
 import { renderStaticPageHtml, pagePath } from "./renderPage";
 import { renderBlogPostHtml, blogPostPath } from "./renderBlogPost";
-import { renderBlogIndexHtml } from "./renderBlogIndex";
+import { renderBlogIndexHtml, blogIndexPath } from "./renderBlogIndex";
+import { LOCALES, normalizeLocale, type Locale } from "./i18n";
 
 type ContentWithRelations = Awaited<ReturnType<typeof fetchContentForSync>>;
 
@@ -20,8 +21,9 @@ function getStaticSiteDir(): string | null {
 }
 
 function targetFilePath(dir: string, content: NonNullable<ContentWithRelations>): string {
+  const locale = normalizeLocale(content.locale);
   const urlPath =
-    content.type === "POST" ? blogPostPath(content.slug) : pagePath(content);
+    content.type === "POST" ? blogPostPath(locale, content.slug) : pagePath({ ...content, locale });
   return path.join(dir, urlPath, "index.html");
 }
 
@@ -37,9 +39,10 @@ export async function syncContentToStaticSite(id: string): Promise<void> {
   try {
     const content = await fetchContentForSync(id);
     if (!content) return;
+    const locale = normalizeLocale(content.locale);
     if (content.status !== "PUBLISHED" || content.noindex) {
       await removeContentFromStaticSite(content);
-      if (content.type === "POST") await regenerateBlogIndex();
+      if (content.type === "POST") await regenerateBlogIndex(locale);
       return;
     }
 
@@ -48,6 +51,7 @@ export async function syncContentToStaticSite(id: string): Promise<void> {
         ? await renderBlogPostHtml({
             title: content.title,
             slug: content.slug,
+            locale,
             body: content.body,
             excerpt: content.excerpt,
             metaTitle: content.metaTitle,
@@ -69,6 +73,7 @@ export async function syncContentToStaticSite(id: string): Promise<void> {
         : renderStaticPageHtml({
             title: content.title,
             slug: content.slug,
+            locale,
             body: content.body,
             excerpt: content.excerpt,
             metaTitle: content.metaTitle,
@@ -82,7 +87,7 @@ export async function syncContentToStaticSite(id: string): Promise<void> {
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     await fs.writeFile(filePath, html, "utf8");
 
-    if (content.type === "POST") await regenerateBlogIndex();
+    if (content.type === "POST") await regenerateBlogIndex(locale);
   } catch (err) {
     console.error(`[staticSite] Failed to sync content ${id} to static site:`, err);
   }
@@ -95,7 +100,7 @@ export async function syncContentToStaticSite(id: string): Promise<void> {
  * safer than a missing one.
  */
 export async function removeContentFromStaticSite(
-  content: Pick<NonNullable<ContentWithRelations>, "id" | "type" | "slug" | "isHomepage">,
+  content: Pick<NonNullable<ContentWithRelations>, "id" | "type" | "slug" | "isHomepage" | "locale">,
 ): Promise<void> {
   const dir = getStaticSiteDir();
   if (!dir) return;
@@ -105,22 +110,24 @@ export async function removeContentFromStaticSite(
   }
 
   try {
-    const urlPath = content.type === "POST" ? blogPostPath(content.slug) : pagePath(content);
+    const locale = normalizeLocale(content.locale);
+    const urlPath =
+      content.type === "POST" ? blogPostPath(locale, content.slug) : pagePath({ ...content, locale });
     const dirPath = path.join(dir, urlPath);
     await fs.rm(dirPath, { recursive: true, force: true });
-    if (content.type === "POST") await regenerateBlogIndex();
+    if (content.type === "POST") await regenerateBlogIndex(locale);
   } catch (err) {
     console.error(`[staticSite] Failed to remove content ${content.id} from static site:`, err);
   }
 }
 
-export async function regenerateBlogIndex(): Promise<void> {
+export async function regenerateBlogIndex(locale: Locale): Promise<void> {
   const dir = getStaticSiteDir();
   if (!dir) return;
 
   try {
     const posts = await prisma.content.findMany({
-      where: { type: "POST", status: "PUBLISHED", noindex: false },
+      where: { type: "POST", status: "PUBLISHED", noindex: false, locale },
       orderBy: { publishedAt: "desc" },
       include: { category: true },
     });
@@ -134,12 +141,20 @@ export async function regenerateBlogIndex(): Promise<void> {
         createdAt: p.createdAt,
         categoryName: p.category?.name ?? null,
       })),
+      locale,
     );
 
-    const filePath = path.join(dir, "blog", "index.html");
+    const filePath = path.join(dir, blogIndexPath(locale), "index.html");
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     await fs.writeFile(filePath, html, "utf8");
   } catch (err) {
-    console.error("[staticSite] Failed to regenerate blog index:", err);
+    console.error(`[staticSite] Failed to regenerate blog index (${locale}):`, err);
+  }
+}
+
+/** Regenerates the blog index for every locale — useful after a bulk import/seed. */
+export async function regenerateAllBlogIndexes(): Promise<void> {
+  for (const locale of LOCALES) {
+    await regenerateBlogIndex(locale);
   }
 }

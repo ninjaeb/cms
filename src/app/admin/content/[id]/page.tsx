@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ContentForm, { type ContentFormInitial } from "@/components/admin/ContentForm";
 import { parseCitations } from "@/lib/seo";
+import { normalizeLocale } from "@/lib/staticSite/i18n";
 
 export default async function EditContentPage({
   params,
@@ -25,6 +26,7 @@ export default async function EditContentPage({
     id: content.id,
     type: content.type,
     status: content.status,
+    locale: normalizeLocale(content.locale),
     title: content.title,
     slug: content.slug,
     excerpt: content.excerpt ?? "",

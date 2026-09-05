@@ -12,8 +12,11 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
-  const content = await prisma.content.findUnique({
+  // Not locale-aware: this route predates multi-language content and picks
+  // whichever translation sorts first ("en") when more than one exists.
+  const content = await prisma.content.findFirst({
     where: { slug },
+    orderBy: { locale: "asc" },
     include: { faqItems: { orderBy: { order: "asc" } } },
   });
 

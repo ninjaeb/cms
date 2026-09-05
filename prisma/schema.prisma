@@ -43,9 +43,14 @@ model Content {
   status ContentStatus @default(DRAFT)
 
   title   String
-  slug    String  @unique
+  slug    String
   excerpt String?
   body    String // markdown source for POST; raw HTML for PAGE (see staticSite renderers)
+
+  // "en" | "ms" | "zh". A translation of the same page/post shares its slug
+  // with the other locales' rows — [slug, locale] together identify one
+  // piece of content, not slug alone (see staticSite/i18n.ts).
+  locale String @default("en")
 
   // PAGE only: syncs to the static site's document root ("/") instead of "/<slug>/".
   isHomepage Boolean @default(false)
@@ -85,8 +90,10 @@ model Content {
 
   faqItems FaqItem[]
 
+  @@unique([slug, locale], name: "slug_locale")
   @@index([status, publishedAt])
   @@index([type])
+  @@index([locale])
 }
 
 model Category {

@@ -51,7 +51,9 @@ async function main() {
 
   const admin = await prisma.user.findUnique({ where: { email: adminEmail } });
 
-  const existingPost = await prisma.content.findUnique({ where: { slug: "hello-world" } });
+  const existingPost = await prisma.content.findUnique({
+    where: { slug_locale: { slug: "hello-world", locale: "en" } },
+  });
   if (!existingPost) {
     await prisma.content.create({
       data: {
