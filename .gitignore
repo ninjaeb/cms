@@ -45,7 +45,3 @@ next-env.d.ts
 # prisma-bundled AI assistant skill docs (not part of this app)
 /.claude/
 
-# sqlite database files
-*.db
-*.db-journal
-

@@ -1,26 +1,37 @@
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('ADMIN', 'EDITOR');
+
+-- CreateEnum
+CREATE TYPE "ContentType" AS ENUM ('POST', 'PAGE');
+
+-- CreateEnum
+CREATE TYPE "ContentStatus" AS ENUM ('DRAFT', 'PUBLISHED', 'SCHEDULED');
+
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
-    "role" TEXT NOT NULL DEFAULT 'EDITOR',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "role" "Role" NOT NULL DEFAULT 'EDITOR',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Content" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "type" TEXT NOT NULL DEFAULT 'POST',
-    "status" TEXT NOT NULL DEFAULT 'DRAFT',
+    "id" TEXT NOT NULL,
+    "type" "ContentType" NOT NULL DEFAULT 'POST',
+    "status" "ContentStatus" NOT NULL DEFAULT 'DRAFT',
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "excerpt" TEXT,
     "body" TEXT NOT NULL,
     "featuredImage" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    "publishedAt" DATETIME,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "publishedAt" TIMESTAMP(3),
     "authorId" TEXT,
     "categoryId" TEXT,
     "metaTitle" TEXT,
@@ -33,24 +44,28 @@ CREATE TABLE "Content" (
     "aiSummary" TEXT,
     "keyEntities" TEXT,
     "sourceCitations" TEXT,
-    "lastFactCheckedAt" DATETIME,
-    CONSTRAINT "Content_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Content_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "lastFactCheckedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Content_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Category" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
-    "description" TEXT
+    "description" TEXT,
+
+    CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Tag" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "slug" TEXT NOT NULL
+    "slug" TEXT NOT NULL,
+
+    CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -58,33 +73,34 @@ CREATE TABLE "ContentTag" (
     "contentId" TEXT NOT NULL,
     "tagId" TEXT NOT NULL,
 
-    PRIMARY KEY ("contentId", "tagId"),
-    CONSTRAINT "ContentTag_contentId_fkey" FOREIGN KEY ("contentId") REFERENCES "Content" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "ContentTag_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT "ContentTag_pkey" PRIMARY KEY ("contentId","tagId")
 );
 
 -- CreateTable
 CREATE TABLE "FaqItem" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "contentId" TEXT NOT NULL,
     "question" TEXT NOT NULL,
     "answer" TEXT NOT NULL,
     "order" INTEGER NOT NULL DEFAULT 0,
-    CONSTRAINT "FaqItem_contentId_fkey" FOREIGN KEY ("contentId") REFERENCES "Content" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+
+    CONSTRAINT "FaqItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Redirect" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "fromPath" TEXT NOT NULL,
     "toPath" TEXT NOT NULL,
     "statusCode" INTEGER NOT NULL DEFAULT 301,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Redirect_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Setting" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT DEFAULT 1,
+    "id" INTEGER NOT NULL DEFAULT 1,
     "siteName" TEXT NOT NULL DEFAULT 'My Site',
     "siteDescription" TEXT NOT NULL DEFAULT '',
     "siteUrl" TEXT NOT NULL DEFAULT 'http://localhost:3000',
@@ -93,7 +109,9 @@ CREATE TABLE "Setting" (
     "defaultOgImage" TEXT NOT NULL DEFAULT '',
     "twitterHandle" TEXT NOT NULL DEFAULT '',
     "allowAiCrawlers" BOOLEAN NOT NULL DEFAULT true,
-    "llmsTxtIntro" TEXT NOT NULL DEFAULT ''
+    "llmsTxtIntro" TEXT NOT NULL DEFAULT '',
+
+    CONSTRAINT "Setting_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -119,3 +137,18 @@ CREATE INDEX "FaqItem_contentId_idx" ON "FaqItem"("contentId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Redirect_fromPath_key" ON "Redirect"("fromPath");
+
+-- AddForeignKey
+ALTER TABLE "Content" ADD CONSTRAINT "Content_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Content" ADD CONSTRAINT "Content_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ContentTag" ADD CONSTRAINT "ContentTag_contentId_fkey" FOREIGN KEY ("contentId") REFERENCES "Content"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ContentTag" ADD CONSTRAINT "ContentTag_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FaqItem" ADD CONSTRAINT "FaqItem_contentId_fkey" FOREIGN KEY ("contentId") REFERENCES "Content"("id") ON DELETE CASCADE ON UPDATE CASCADE;

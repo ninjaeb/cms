@@ -5,7 +5,7 @@ A content management system for publishing content that's optimized for both
 Optimization — being accurately understood, summarized, and cited by AI
 answer engines like ChatGPT, Claude, and Perplexity).
 
-Built with Next.js (App Router), Prisma + SQLite, and Tailwind CSS.
+Built with Next.js (App Router), Prisma + PostgreSQL, and Tailwind CSS.
 
 ## Features
 
@@ -37,10 +37,18 @@ Built with Next.js (App Router), Prisma + SQLite, and Tailwind CSS.
 
 ## Getting started
 
+Requires a running PostgreSQL server (local, Docker, or hosted).
+
 ```bash
 npm install
-cp .env.example .env      # then edit AUTH_SECRET, SITE_URL, etc.
-npm run db:migrate        # creates prisma/dev.db and applies the schema
+cp .env.example .env      # then edit DATABASE_URL, AUTH_SECRET, SITE_URL, etc.
+
+# create the database, e.g.:
+#   createdb cms_dev
+# or, for a local Postgres role dedicated to this app:
+#   createuser cms --pwprompt && createdb cms_dev -O cms
+
+npm run db:migrate        # applies the schema
 npm run db:seed           # creates an admin user + a sample article
 npm run dev
 ```
@@ -65,8 +73,9 @@ before seeding a real environment).
 
 ## Notes
 
-- The SQLite database (`prisma/dev.db`) is local and gitignored. For
-  production, either keep SQLite on a persistent volume or swap the Prisma
-  datasource/adapter for Postgres.
+- The app connects to Postgres via `@prisma/adapter-pg` using the
+  `DATABASE_URL` connection string (see `src/lib/prisma.ts`). Any standard
+  Postgres instance works — local, Docker, or a managed provider (Neon,
+  Supabase, RDS, etc.).
 - `AUTH_SECRET` in `.env` must be replaced with a real random secret outside
   of local development (`openssl rand -base64 32`).
