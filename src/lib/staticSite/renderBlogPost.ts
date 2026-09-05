@@ -2,10 +2,12 @@ import { markdownToHtml } from "@/lib/markdown";
 import { parseCitations, parseEntities, type Citation } from "@/lib/seo";
 import { ORGANIZATION_JSON_LD, SITE_NAME, SITE_ORIGIN } from "./design";
 import { renderDocument } from "./document";
+import { UI, dateLocale, localePrefix, type Locale } from "./i18n";
 
 export type StaticBlogPostContent = {
   title: string;
   slug: string;
+  locale: Locale;
   body: string; // markdown
   excerpt: string | null;
   metaTitle: string | null;
@@ -25,17 +27,26 @@ export type StaticBlogPostContent = {
   faqItems: { question: string; answer: string }[];
 };
 
-export function blogPostPath(slug: string): string {
+/** Unprefixed path for a blog post, e.g. "/blog/my-post/" — same shape at every locale. */
+function unprefixedBlogPostPath(slug: string): string {
   return `/blog/${slug}/`;
 }
 
+/** Full, locale-prefixed path this post is written to and served at. */
+export function blogPostPath(locale: Locale, slug: string): string {
+  return `${localePrefix(locale)}${unprefixedBlogPostPath(slug)}`;
+}
+
 export async function renderBlogPostHtml(content: StaticBlogPostContent): Promise<string> {
-  const urlPath = blogPostPath(content.slug);
-  const canonical = `${SITE_ORIGIN}${urlPath}`;
+  const t = UI[content.locale];
+  const activePath = unprefixedBlogPostPath(content.slug);
+  const canonical = `${SITE_ORIGIN}${blogPostPath(content.locale, content.slug)}`;
+  const blogIndexHref = `${localePrefix(content.locale)}/blog/`;
   const html = await markdownToHtml(content.body);
   const citations = parseCitations(content.sourceCitations);
   const entities = parseEntities(content.keyEntities);
-  const dateLabel = (content.publishedAt || content.createdAt).toLocaleDateString("en-GB", {
+  const dl = dateLocale(content.locale);
+  const dateLabel = (content.publishedAt || content.createdAt).toLocaleDateString(dl, {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -55,13 +66,14 @@ export async function renderBlogPostHtml(content: StaticBlogPostContent): Promis
       dateModified: content.updatedAt.toISOString(),
       mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
       url: canonical,
+      inLanguage: content.locale,
     },
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: SITE_ORIGIN },
-        { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_ORIGIN}/blog/` },
+        { "@type": "ListItem", position: 1, name: t.home, item: `${SITE_ORIGIN}${localePrefix(content.locale)}/` },
+        { "@type": "ListItem", position: 2, name: t.blog, item: `${SITE_ORIGIN}${blogIndexHref}` },
         { "@type": "ListItem", position: 3, name: content.title, item: canonical },
       ],
     },
@@ -80,10 +92,10 @@ export async function renderBlogPostHtml(content: StaticBlogPostContent): Promis
 
   const bodyMain = `<section class="phero">
   <div class="wrap">
-    <span class="crumb"><a href="/">Home</a> / <a href="/blog/">Blog</a>${
+    <span class="crumb"><a href="${localePrefix(content.locale)}/">${t.home}</a> / <a href="${blogIndexHref}">${t.blog}</a>${
       content.categoryName ? ` / ${escapeHtml(content.categoryName)}` : ""
     }</span>
-    <span class="eyebrow">Blog</span>
+    <span class="eyebrow">${t.blogTitle}</span>
     <h1>${escapeHtml(content.title)}</h1>
     ${content.excerpt ? `<p class="lead">${escapeHtml(content.excerpt)}</p>` : ""}
   </div>
@@ -91,11 +103,11 @@ export async function renderBlogPostHtml(content: StaticBlogPostContent): Promis
 <section class="section">
   <div class="wrap">
     <div class="legal rv">
-      <span class="upd">${dateLabel}${content.authorName ? ` · By ${escapeHtml(content.authorName)}` : ""}</span>
+      <span class="upd">${dateLabel}${content.authorName ? ` · ${escapeHtml(content.authorName)}` : ""}</span>
       ${
         content.aiSummary
           ? `<div style="background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md,14px);padding:22px 26px;margin-bottom:32px">
-        <p style="font:600 .72rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);margin:0 0 8px">Quick answer</p>
+        <p style="font:600 .72rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--petrol);margin:0 0 8px">${t.quickAnswer}</p>
         <p style="margin:0;color:var(--ink)">${escapeHtml(content.aiSummary)}</p>
       </div>`
           : ""
@@ -110,7 +122,7 @@ export async function renderBlogPostHtml(content: StaticBlogPostContent): Promis
       }
       ${
         content.faqItems.length > 0
-          ? `<h2 style="margin-top:48px">Frequently asked questions</h2>
+          ? `<h2 style="margin-top:48px">${t.faqHeading}</h2>
       ${content.faqItems
         .map((f) => `<h3>${escapeHtml(f.question)}</h3>\n<p>${escapeHtml(f.answer)}</p>`)
         .join("\n")}`
@@ -118,13 +130,13 @@ export async function renderBlogPostHtml(content: StaticBlogPostContent): Promis
       }
       ${
         citations.length > 0
-          ? `<h2 style="margin-top:48px">Sources</h2>
+          ? `<h2 style="margin-top:48px">${t.sourcesHeading}</h2>
       <ul>${citations.map((c: Citation) => `<li><a href="${escapeAttr(c.url)}" target="_blank" rel="noopener noreferrer nofollow">${escapeHtml(c.label)}</a></li>`).join("")}</ul>`
           : ""
       }
       ${
         content.lastFactCheckedAt
-          ? `<p style="margin-top:32px;font-size:.85rem;color:var(--ink-2)">Facts last verified ${content.lastFactCheckedAt.toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" })}.</p>`
+          ? `<p style="margin-top:32px;font-size:.85rem;color:var(--ink-2)">${t.factsVerified} ${content.lastFactCheckedAt.toLocaleDateString(dl, { year: "numeric", month: "long", day: "numeric" })}.</p>`
           : ""
       }
     </div>
@@ -136,9 +148,15 @@ export async function renderBlogPostHtml(content: StaticBlogPostContent): Promis
     description: content.metaDescription || content.excerpt,
     canonical,
     ogImage: content.ogImage || content.featuredImage,
-    activePath: urlPath,
+    activePath,
+    locale: content.locale,
     bodyMain,
     jsonLd,
+    hreflang: {
+      en: `${SITE_ORIGIN}${unprefixedBlogPostPath(content.slug)}`,
+      ms: `${SITE_ORIGIN}/ms${unprefixedBlogPostPath(content.slug)}`,
+      zh: `${SITE_ORIGIN}/zh${unprefixedBlogPostPath(content.slug)}`,
+    },
   });
 }
 

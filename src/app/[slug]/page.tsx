@@ -17,9 +17,12 @@ import SiteFooter from "@/components/public/SiteFooter";
 // Content is managed live in the admin — never prerender this at build time.
 export const dynamic = "force-dynamic";
 
+// Not locale-aware: this route predates multi-language content and picks
+// whichever translation sorts first ("en") when more than one exists.
 async function getContent(slug: string) {
-  return prisma.content.findUnique({
+  return prisma.content.findFirst({
     where: { slug },
+    orderBy: { locale: "asc" },
     include: {
       category: true,
       author: true,

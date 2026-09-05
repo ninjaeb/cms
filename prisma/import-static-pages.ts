@@ -69,7 +69,9 @@ async function main() {
       continue;
     }
 
-    const existing = await prisma.content.findUnique({ where: { slug: page.slug } });
+    const existing = await prisma.content.findUnique({
+      where: { slug_locale: { slug: page.slug, locale: "en" } },
+    });
     if (existing) {
       console.log(`skip ${page.slug}: a Content row with this slug already exists`);
       continue;

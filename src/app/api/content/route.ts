@@ -15,15 +15,18 @@ export async function POST(req: NextRequest) {
   }
   const data = parsed.data;
 
-  const existingSlug = await prisma.content.findUnique({ where: { slug: data.slug } });
+  const existingSlug = await prisma.content.findUnique({
+    where: { slug_locale: { slug: data.slug, locale: data.locale } },
+  });
   if (existingSlug) {
-    return NextResponse.json({ error: "Slug is already in use." }, { status: 409 });
+    return NextResponse.json({ error: "Slug is already in use for this language." }, { status: 409 });
   }
 
   const created = await prisma.content.create({
     data: {
       type: data.type,
       status: data.status,
+      locale: data.locale,
       title: data.title,
       slug: data.slug,
       excerpt: data.excerpt || null,

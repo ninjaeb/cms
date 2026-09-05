@@ -11,6 +11,7 @@ export type ContentFormInitial = {
   id?: string;
   type: "POST" | "PAGE";
   status: "DRAFT" | "PUBLISHED" | "SCHEDULED";
+  locale: "en" | "ms" | "zh";
   title: string;
   slug: string;
   excerpt: string;
@@ -36,6 +37,7 @@ export type ContentFormInitial = {
 const EMPTY: ContentFormInitial = {
   type: "POST",
   status: "DRAFT",
+  locale: "en",
   title: "",
   slug: "",
   excerpt: "",
@@ -152,6 +154,7 @@ export default function ContentForm({
     const payload = {
       type: form.type,
       status: form.status,
+      locale: form.locale,
       title: form.title,
       slug: form.slug,
       excerpt: form.excerpt || null,
@@ -428,6 +431,20 @@ export default function ContentForm({
             >
               <option value="POST">Post</option>
               <option value="PAGE">Page</option>
+            </select>
+          </Field>
+          <Field
+            label="Language"
+            hint="A translation shares the same slug as the other languages' version of this page — only the language differs. English syncs to the site root; Malay and Chinese sync under /ms/ and /zh/."
+          >
+            <select
+              value={form.locale}
+              onChange={(e) => update("locale", e.target.value as "en" | "ms" | "zh")}
+              className="input"
+            >
+              <option value="en">English</option>
+              <option value="ms">Bahasa Malaysia</option>
+              <option value="zh">中文 (Chinese)</option>
             </select>
           </Field>
           {form.type === "PAGE" && (

@@ -1,4 +1,5 @@
 import { HEAD_ASSETS, SITE_NAME, SITE_ORIGIN, SITE_SCRIPTS, getSiteCss, renderFooter, renderHeader } from "./design";
+import { htmlLang, ogLocale, type Locale } from "./i18n";
 
 export type HreflangLinks = { en: string; ms: string; zh: string };
 
@@ -7,7 +8,9 @@ export function renderDocument(opts: {
   description?: string | null;
   canonical: string;
   ogImage?: string | null;
+  /** Unprefixed path, e.g. "/about/" or "/blog/my-post/" — see renderHeader. */
   activePath: string;
+  locale: Locale;
   bodyMain: string;
   jsonLd?: object[];
   hreflang?: HreflangLinks;
@@ -26,7 +29,7 @@ export function renderDocument(opts: {
     .join("\n");
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${htmlLang(opts.locale)}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,7 +44,7 @@ ${hreflangLinks}
 <meta property="og:title" content="${escapeAttr(opts.title)}">
 <meta property="og:description" content="${escapeAttr(description)}">
 <meta property="og:image" content="${image}">
-<meta property="og:locale" content="en_MY">
+<meta property="og:locale" content="${ogLocale(opts.locale)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${escapeAttr(opts.title)}">
 <meta name="twitter:description" content="${escapeAttr(description)}">
@@ -54,11 +57,11 @@ ${getSiteCss()}
 </head>
 <body>
 <a class="skip" href="#main" style="position:absolute;left:-9999px">Skip to content</a>
-${renderHeader(opts.activePath)}
+${renderHeader(opts.activePath, opts.locale)}
 <main id="main">
 ${opts.bodyMain}
 </main>
-${renderFooter()}
+${renderFooter(opts.locale)}
 ${SITE_SCRIPTS}
 </body>
 </html>`;

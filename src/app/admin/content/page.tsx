@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { LANG_LABEL, normalizeLocale } from "@/lib/staticSite/i18n";
 
 const STATUS_STYLES: Record<string, string> = {
   PUBLISHED: "bg-green-100 text-green-800",
@@ -34,6 +35,7 @@ export default async function ContentListPage() {
             <tr>
               <th className="px-4 py-3 font-medium">Title</th>
               <th className="px-4 py-3 font-medium">Type</th>
+              <th className="px-4 py-3 font-medium">Lang</th>
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium">Category</th>
               <th className="px-4 py-3 font-medium">GEO</th>
@@ -54,6 +56,7 @@ export default async function ContentListPage() {
                   <p className="text-xs text-neutral-500">/{item.slug}</p>
                 </td>
                 <td className="px-4 py-3 text-neutral-600">{item.type}</td>
+                <td className="px-4 py-3 text-neutral-600">{LANG_LABEL[normalizeLocale(item.locale)]}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[item.status]}`}
@@ -82,7 +85,7 @@ export default async function ContentListPage() {
             ))}
             {items.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-neutral-500">
+                <td colSpan={8} className="px-4 py-8 text-center text-neutral-500">
                   No content yet. Create your first item.
                 </td>
               </tr>

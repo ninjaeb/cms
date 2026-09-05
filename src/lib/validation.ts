@@ -13,6 +13,7 @@ export const faqItemSchema = z.object({
 export const contentSchema = z.object({
   type: z.enum(["POST", "PAGE"]),
   status: z.enum(["DRAFT", "PUBLISHED", "SCHEDULED"]),
+  locale: z.enum(["en", "ms", "zh"]).default("en"),
   title: z.string().min(1).max(200),
   slug: z
     .string()

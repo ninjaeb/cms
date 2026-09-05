@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { LANG_LABEL, LOCALES, SERVICES_NAV, UI, localePrefix, type Locale } from "./i18n";
 
 // The gotka.com static site's shared design system, extracted verbatim from
 // its own pages so CMS-generated pages (blog posts and CMS-managed marketing
@@ -196,33 +197,38 @@ export const SITE_SCRIPTS = `<script>
 })();
 </script>`;
 
-const SERVICES_LINKS = [
-  { href: "/hosting/", label: "Cloud Hosting" },
-  { href: "/domains/", label: "Domains" },
-  { href: "/web-design/", label: "Web Design" },
-  { href: "/app-development/", label: "App & System Development" },
-  { href: "/digital-namecard/", label: "Digital Name Card" },
-];
-
-function isServicesActive(activePath: string) {
-  return SERVICES_LINKS.some((l) => l.href === activePath);
-}
-
 /**
  * Renders the shared site header/nav, verbatim to the original site's markup
- * except for: which link is marked active, and a "Blog" link added to the
+ * except for: which link is marked active, a "Blog" link added to the
  * primary nav (the original static pages don't have this yet — add it to
- * their nav manually, see README).
+ * their nav manually, see README), and full nav/lang-switcher localization.
+ *
+ * activePath is the *unprefixed* path (e.g. "/about/", "/blog/my-post/",
+ * "/") — the same shape regardless of locale; this function adds the
+ * locale prefix to every link it renders.
  */
-export function renderHeader(activePath: string): string {
-  const servicesOpen = isServicesActive(activePath);
-  const servicesLinks = SERVICES_LINKS.map(
-    (l) => `          <a ${l.href === activePath ? 'class="active" ' : " "}href="${l.href}">${l.label}</a>`,
-  ).join("\n");
+export function renderHeader(activePath: string, locale: Locale): string {
+  const t = UI[locale];
+  const prefix = localePrefix(locale);
+  const services = SERVICES_NAV[locale];
+  const servicesOpen = services.some((l) => l.href === activePath);
+  const servicesLinks = services
+    .map(
+      (l) =>
+        `          <a ${l.href === activePath ? 'class="active" ' : " "}href="${prefix}${l.href}">${l.label}</a>`,
+    )
+    .join("\n");
+
+  const langSwitcher = LOCALES.map((l) => {
+    const href = l === "en" ? activePath : `/${l}${activePath}`;
+    return l === locale
+      ? `<span class="on" aria-current="page">${LANG_LABEL[l]}</span>`
+      : `<a href="${href}">${LANG_LABEL[l]}</a>`;
+  }).join("");
 
   return `<header class="hdr">
   <div class="wrap hdr-in">
-    <a class="brand" href="/" aria-label="${SITE_NAME}">
+    <a class="brand" href="${prefix}/" aria-label="${SITE_NAME}">
       <svg class="b-badge" viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" rx="28" fill="#0E1B28"/><g transform="translate(28 29) scale(0.62)"><path d="M68 12 L32 12 Q12 12 12 32 L12 68 Q12 88 32 88 L48 88 Q68 88 68 68 L68 52 L42 52" fill="none" stroke="#FFFFFF" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/></g><circle cx="92" cy="28" r="8" fill="#2EC27E"/></svg>
       <span class="b-txt">
         <svg class="b-word" viewBox="0 0 464 100" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"><path d="M68 12 L32 12 Q12 12 12 32 L12 68 Q12 88 32 88 L48 88 Q68 88 68 68 L68 52 L42 52"/><path transform="translate(96 0)" d="M32 12 L48 12 Q68 12 68 32 L68 68 Q68 88 48 88 L32 88 Q12 88 12 68 L12 32 Q12 12 32 12 Z"/><path transform="translate(192 0)" d="M12 12 L68 12 M40 12 L40 88"/><path transform="translate(288 0)" d="M16 12 L16 88 M64 12 L16 60 M34 44 L66 88"/><path transform="translate(384 0)" d="M12 88 L12 48 Q12 12 40 12 Q68 12 68 48 L68 88 M12 60 L68 60"/></g></svg>
@@ -231,23 +237,23 @@ export function renderHeader(activePath: string): string {
     </a>
     <div class="nav-mobile-panel">
     <nav class="nav" id="nav" aria-label="Main">
-      <a ${activePath === "/" ? 'class="active" ' : " "}href="/">Home</a>
+      <a ${activePath === "/" ? 'class="active" ' : " "}href="${prefix}/">${t.home}</a>
       <details class="nav-drop"${servicesOpen ? " open" : ""}>
-        <summary class="${servicesOpen ? "active" : ""}">Services<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <summary class="${servicesOpen ? "active" : ""}">${t.services}<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
         <div class="nav-drop-panel">
 ${servicesLinks}
         </div>
       </details>
-      <a ${activePath === "/about/" ? 'class="active" ' : " "}href="/about/">About</a>
-      <a ${activePath.startsWith("/blog") ? 'class="active" ' : " "}href="/blog/">Blog</a>
-      <a ${activePath === "/contact/" ? 'class="active" ' : " "}href="/contact/">Contact</a>
+      <a ${activePath === "/about/" ? 'class="active" ' : " "}href="${prefix}/about/">${t.about}</a>
+      <a ${activePath.startsWith("/blog") ? 'class="active" ' : " "}href="${prefix}/blog/">${t.blog}</a>
+      <a ${activePath === "/contact/" ? 'class="active" ' : " "}href="${prefix}/contact/">${t.contact}</a>
     </nav>
     <div class="hdr-cta">
-      <a class="signin" href="https://gotka.com/clients/login">Sign in</a>
-      <a class="btn btn-sm" href="/hosting/">Get started</a>
+      <a class="signin" href="https://gotka.com/clients/login">${t.signIn}</a>
+      <a class="btn btn-sm" href="${prefix}/hosting/">${t.getStarted}</a>
     </div>
     </div>
-    <div class="lang"><span class="on" aria-current="page">EN</span><a href="/ms/">BM</a><a href="/zh/">中文</a></div>
+    <div class="lang">${langSwitcher}</div>
     <button class="tgl" id="theme-toggle" type="button" aria-label="Toggle dark mode">
       <svg class="i-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"/></svg>
       <svg class="i-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 14.5A8.6 8.6 0 0 1 9.5 3.4a8.6 8.6 0 1 0 11.1 11.1z"/></svg>
@@ -259,13 +265,19 @@ ${servicesLinks}
 </header>`;
 }
 
-/** Verbatim from the static site — identical on every page. */
-export function renderFooter(): string {
+/**
+ * Verbatim from the static site — identical on every page. The footer's own
+ * copy stays in English across all locales (its Legal/Clients Area links
+ * point at pages that don't have translated counterparts); only the brand
+ * logo's link home is locale-aware.
+ */
+export function renderFooter(locale: Locale): string {
+  const prefix = localePrefix(locale);
   return `<footer class="foot">
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <a class="brand" href="/" aria-label="${SITE_NAME}">
+        <a class="brand" href="${prefix}/" aria-label="${SITE_NAME}">
           <svg class="b-badge" viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" rx="28" fill="#0D5C63"/><g transform="translate(28 29) scale(0.62)"><path d="M68 12 L32 12 Q12 12 12 32 L12 68 Q12 88 32 88 L48 88 Q68 88 68 68 L68 52 L42 52" fill="none" stroke="#FFFFFF" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/></g><circle cx="92" cy="28" r="8" fill="#2EC27E"/></svg>
           <span class="b-txt">
             <svg class="b-word" viewBox="0 0 464 100" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"><path d="M68 12 L32 12 Q12 12 12 32 L12 68 Q12 88 32 88 L48 88 Q68 88 68 68 L68 52 L42 52"/><path transform="translate(96 0)" d="M32 12 L48 12 Q68 12 68 32 L68 68 Q68 88 48 88 L32 88 Q12 88 12 68 L12 32 Q12 12 32 12 Z"/><path transform="translate(192 0)" d="M12 12 L68 12 M40 12 L40 88"/><path transform="translate(288 0)" d="M16 12 L16 88 M64 12 L16 60 M34 44 L66 88"/><path transform="translate(384 0)" d="M12 88 L12 48 Q12 12 40 12 Q68 12 68 48 L68 88 M12 60 L68 60"/></g></svg>
