@@ -4,10 +4,7 @@ import LogoutButton from "@/components/admin/LogoutButton";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard" },
-  { href: "/admin/content", label: "Content" },
-  { href: "/admin/categories", label: "Categories" },
-  { href: "/admin/tags", label: "Tags" },
-  { href: "/admin/redirects", label: "Redirects" },
+  { href: "/admin/scan", label: "Scan" },
   { href: "/admin/settings", label: "Settings" },
 ];
 
@@ -23,7 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="flex">
         <aside className="hidden w-56 shrink-0 border-r border-neutral-200 bg-white p-4 sm:block">
           <div className="mb-6 px-2">
-            <p className="text-sm font-semibold text-neutral-900">SEO/GEO CMS</p>
+            <p className="text-sm font-semibold text-neutral-900">SEO/GEO Scanner</p>
             <p className="text-xs text-neutral-500">{session.name}</p>
           </div>
           <nav className="space-y-1">
@@ -38,13 +35,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             ))}
           </nav>
           <div className="mt-6 space-y-1 border-t border-neutral-200 pt-4">
-            <Link
-              href="/"
-              target="_blank"
-              className="block rounded-md px-2 py-1.5 text-sm text-neutral-500 hover:bg-neutral-100"
-            >
-              View site ↗
-            </Link>
             <LogoutButton />
           </div>
         </aside>

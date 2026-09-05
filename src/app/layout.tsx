@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { getSettings } from "@/lib/settings";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,21 +12,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Cascades to every route: settings are read from the database on every
-// request, so nothing in this app should ever be prerendered at build time
-// (the build environment may not even have a database to reach).
-export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "SEO/GEO Scanner",
+  description: "Scores and recommends SEO/GEO improvements for a scanned public_html directory.",
+};
 
-export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSettings();
-  return {
-    metadataBase: new URL(settings.siteUrl),
-    title: { default: settings.siteName, template: `%s | ${settings.siteName}` },
-    description: settings.siteDescription,
-  };
-}
-
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"

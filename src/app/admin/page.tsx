@@ -2,29 +2,23 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminDashboard() {
-  const [total, published, drafts, faqCount] = await Promise.all([
-    prisma.content.count(),
-    prisma.content.count({ where: { status: "PUBLISHED" } }),
-    prisma.content.count({ where: { status: "DRAFT" } }),
-    prisma.faqItem.count(),
-  ]);
-
-  const missingAiSummary = await prisma.content.count({
-    where: { status: "PUBLISHED", OR: [{ aiSummary: null }, { aiSummary: "" }] },
+  const latestRun = await prisma.scanRun.findFirst({
+    orderBy: { startedAt: "desc" },
   });
+  const totalRuns = await prisma.scanRun.count();
 
   const stats = [
-    { label: "Total content", value: total },
-    { label: "Published", value: published },
-    { label: "Drafts", value: drafts },
-    { label: "FAQ entries (GEO)", value: faqCount },
+    { label: "Scan runs", value: totalRuns },
+    { label: "Pages in last scan", value: latestRun?.pageCount ?? "—" },
+    { label: "Avg SEO score", value: latestRun?.avgSeoScore != null ? `${latestRun.avgSeoScore}%` : "—" },
+    { label: "Avg GEO score", value: latestRun?.avgGeoScore != null ? `${latestRun.avgGeoScore}%` : "—" },
   ];
 
   return (
     <div>
       <h1 className="text-2xl font-semibold text-neutral-900">Dashboard</h1>
       <p className="mt-1 text-sm text-neutral-500">
-        Overview of your content, SEO health, and GEO readiness.
+        SEO and GEO health across your scanned site.
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -36,28 +30,18 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      {missingAiSummary > 0 && (
+      {!latestRun && (
         <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          {missingAiSummary} published item{missingAiSummary === 1 ? "" : "s"} missing an AI
-          summary — this hurts how AI answer engines cite your content.{" "}
-          <Link href="/admin/content" className="font-medium underline">
-            Review content
-          </Link>
+          No scans yet. Configure a root directory in Settings, then run your first scan.
         </div>
       )}
 
       <div className="mt-8 flex gap-3">
         <Link
-          href="/admin/content/new"
+          href="/admin/scan"
           className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
         >
-          New content
-        </Link>
-        <Link
-          href="/admin/content"
-          className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100"
-        >
-          Manage content
+          Go to Scan
         </Link>
       </div>
     </div>
