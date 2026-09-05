@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { contentSchema } from "@/lib/validation";
+import { syncContentToStaticSite } from "@/lib/staticSite/sync";
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
@@ -27,6 +28,7 @@ export async function POST(req: NextRequest) {
       slug: data.slug,
       excerpt: data.excerpt || null,
       body: data.body,
+      isHomepage: data.isHomepage,
       featuredImage: data.featuredImage || null,
       publishedAt:
         data.status === "PUBLISHED"
@@ -55,6 +57,8 @@ export async function POST(req: NextRequest) {
       },
     },
   });
+
+  await syncContentToStaticSite(created.id);
 
   return NextResponse.json({ id: created.id, slug: created.slug }, { status: 201 });
 }

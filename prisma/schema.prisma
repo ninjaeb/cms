@@ -45,7 +45,10 @@ model Content {
   title   String
   slug    String  @unique
   excerpt String?
-  body    String // markdown source
+  body    String // markdown source for POST; raw HTML for PAGE (see staticSite renderers)
+
+  // PAGE only: syncs to the static site's document root ("/") instead of "/<slug>/".
+  isHomepage Boolean @default(false)
 
   featuredImage String?
 

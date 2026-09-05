@@ -29,6 +29,7 @@ export default async function EditContentPage({
     slug: content.slug,
     excerpt: content.excerpt ?? "",
     body: content.body,
+    isHomepage: content.isHomepage,
     featuredImage: content.featuredImage ?? "",
     categoryId: content.categoryId ?? "",
     tagIds: content.tags.map((t) => t.tagId),

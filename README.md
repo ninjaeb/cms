@@ -70,6 +70,10 @@ before seeding a real environment).
   public site
 - `src/app/sitemap.ts`, `src/app/robots.ts`, `src/app/llms.txt/route.ts`,
   `src/app/[slug]/raw/route.ts` — SEO/GEO infrastructure
+- `src/lib/staticSite/**` — renders and syncs content to a linked static
+  site's document root (see "Managing a linked static site" below);
+  `prisma/import-static-pages.ts` brings that site's existing pages under
+  CMS management
 
 ## Deploying to cPanel
 
@@ -94,6 +98,9 @@ Prerequisites, done once in cPanel:
    - `AUTH_SECRET` — a real random secret (`openssl rand -base64 32`)
    - `SITE_URL` — the site's public URL, e.g. `https://cms.gotka.com`
    - `NODE_ENV` = `production`
+   - `STATIC_SITE_DIR` — optional; set this to sync content to a linked
+     static site's document root (e.g. `/home/gotka7/public_html`) — see
+     "Managing a linked static site" below
 4. The first deploy, run once via the Node.js App's "Run NPM Install" or an
    SSH session with the nodevenv activated: `npx tsx prisma/seed.ts` (or set
    `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD` env vars first to avoid the
@@ -103,6 +110,55 @@ After that, every **Deploy HEAD Commit** runs `.cpanel.yml`'s tasks: install
 dependencies, apply pending migrations (`prisma migrate deploy`), build, and
 restart the app (`touch tmp/restart.txt`, the standard Passenger convention
 cPanel's Node.js Selector is built on).
+
+## Managing a linked static site
+
+If a separate static site (e.g. a marketing site built as plain HTML) lives
+on the same server, this CMS can manage its content directly: publishing in
+`/admin` writes the corresponding static HTML file straight into that site's
+document root, matching its existing design exactly.
+
+- **Blog posts** (`type: POST`) sync to `<site>/blog/<slug>/index.html` using
+  a shared blog template (header/footer/CSS copied from the static site) —
+  written from the post's Markdown body, so the normal admin editor and GEO
+  fields (AI summary, FAQ, citations) apply as usual. `<site>/blog/index.html`
+  (a listing of all published posts) regenerates automatically on every
+  publish/unpublish/delete.
+- **Pages** (`type: PAGE`) sync to `<site>/<slug>/index.html` (or `<site>/`
+  itself, if "This is the homepage" is checked). A page's **Body** field is
+  **raw HTML**, not Markdown — it's inserted directly into the static page's
+  `<main>`, so hand-built layouts (pricing tables, grids, forms) are
+  reproduced exactly rather than flattened through a generic content
+  pipeline. The admin's Body field switches to "Raw HTML" and shows this
+  hint automatically when Type is set to Page.
+- The site's shared design system (colors, fonts, header, nav, footer) lives
+  in `src/lib/staticSite/design.ts` and `src/lib/staticSite/assets/site.css`
+  — update these if the static site's design changes.
+- The generated header adds a **Blog** nav link that the original static
+  pages don't have. It only appears on pages regenerated through the CMS —
+  see the import step below to bring existing pages under CMS management
+  (which also regenerates them with this link included).
+
+**Setup:**
+1. Set `STATIC_SITE_DIR` to the static site's absolute document root (e.g.
+   `/home/youruser/public_html`) — in `.env` locally, or as a cPanel Node.js
+   App environment variable in production. Sync is a no-op whenever this is
+   unset, so it's safe to leave off entirely if there's no linked site.
+2. To bring **existing** static pages under CMS management, run (once, with
+   `STATIC_SITE_DIR` set) `npx tsx prisma/import-static-pages.ts` — it reads
+   the current live HTML files (a hardcoded list of slugs in that script;
+   edit it to match your site's actual pages) and creates matching `PAGE`
+   Content rows. It's read-only against the static site and safe to re-run
+   (it skips any slug that already has a Content row, so it never clobbers
+   edits already made in the admin).
+3. Review each imported page in `/admin/content`, then hit **Save** — this
+   triggers its first sync back through the CMS's renderer. Confirm the
+   result looks right before moving on to the next one (the render should be
+   visually equivalent to the original, but always verify).
+
+**Limitations:** only content managed this way is CMS-controlled — anything
+else on the static site (other languages, the contact form's PHP handler,
+etc.) stays exactly as hand-built, untouched by the CMS.
 
 ## Notes
 
