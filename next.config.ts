@@ -2,15 +2,16 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // The cPanel deploy host is memory-constrained and shared with other
-  // tenants; a `next build` was observed spawning one worker per detected
-  // CPU (31, on that host) for static generation, each with its own V8
-  // heap, which reliably crashed the build with an OOM allocation failure.
-  // This app has well under 100 routes, so setting
-  // staticGenerationMinPagesPerWorker above that count keeps generation to
-  // a single worker, trading build parallelism for a much lower peak
-  // memory footprint.
+  // tenants; without this, `next build`'s getNumberOfWorkers() (see
+  // node_modules/next/dist/build/index.js) falls back to a CPU-count-based
+  // default, spawning one worker process per detected CPU (31, on that
+  // host) for page-data collection and static generation, each with its
+  // own V8 heap — this reliably crashed the build with an OOM allocation
+  // failure. Pinning experimental.cpus to 1 keeps the build to a single
+  // worker, trading build parallelism for a much lower peak memory
+  // footprint.
   experimental: {
-    staticGenerationMinPagesPerWorker: 1000,
+    cpus: 1,
   },
 };
 
