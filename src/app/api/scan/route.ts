@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { getSettings } from "@/lib/settings";
-import { findHtmlFiles, parsePage } from "@/lib/htmlScan";
+import { crawlSite } from "@/lib/htmlScan";
 import { computeChecklistFromPageSignals } from "@/lib/seo";
 import { scanRequestSchema } from "@/lib/validation";
 
@@ -15,22 +15,22 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const settings = await getSettings();
-  const rootDir = parsed.data.rootDir || settings.scanRootDir;
-  if (!rootDir) {
+  const baseUrl = parsed.data.baseUrl || settings.scanBaseUrl;
+  if (!baseUrl) {
     return NextResponse.json(
-      { error: "No root directory configured. Set it in Settings first." },
+      { error: "No base URL configured. Set it in Settings first." },
       { status: 400 },
     );
   }
 
-  const scanRun = await prisma.scanRun.create({ data: { rootDir } });
+  const scanRun = await prisma.scanRun.create({ data: { baseUrl } });
 
-  let files: string[];
+  let pagesFound;
   try {
-    files = await findHtmlFiles(rootDir);
+    pagesFound = await crawlSite(baseUrl);
   } catch (err) {
     return NextResponse.json(
-      { error: `Failed to read directory: ${err instanceof Error ? err.message : String(err)}` },
+      { error: `Failed to crawl ${baseUrl}: ${err instanceof Error ? err.message : String(err)}` },
       { status: 400 },
     );
   }
@@ -39,8 +39,7 @@ export async function POST(req: NextRequest) {
   let geoTotal = 0;
   let pageCount = 0;
 
-  for (const filePath of files) {
-    const signals = await parsePage(filePath, rootDir);
+  for (const signals of pagesFound) {
     const checklist = computeChecklistFromPageSignals(signals);
     const seoItems = checklist.filter((c) => c.group === "seo");
     const geoItems = checklist.filter((c) => c.group === "geo");
@@ -50,7 +49,7 @@ export async function POST(req: NextRequest) {
     await prisma.pageScan.create({
       data: {
         scanRunId: scanRun.id,
-        filePath,
+        sourceUrl: signals.sourceUrl,
         urlPath: signals.urlPath,
         title: signals.title,
         seoScore,

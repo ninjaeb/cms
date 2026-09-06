@@ -25,7 +25,7 @@ export default async function PageScanDetail({
       </Link>
       <h1 className="mt-2 text-2xl font-semibold text-neutral-900">{page.title || page.urlPath}</h1>
       <p className="mt-1 font-mono text-sm text-neutral-500">{page.urlPath}</p>
-      <p className="mt-1 text-xs text-neutral-400">{page.filePath}</p>
+      <p className="mt-1 text-xs text-neutral-400">{page.sourceUrl}</p>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="rounded-lg border border-neutral-200 bg-white p-5">

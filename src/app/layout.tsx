@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "SEO/GEO Scanner",
-  description: "Scores and recommends SEO/GEO improvements for a scanned public_html directory.",
+  description: "Crawls a site and scores/recommends SEO/GEO improvements for each page.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

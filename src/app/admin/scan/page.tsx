@@ -22,7 +22,7 @@ export default async function ScanPage() {
         <div>
           <h1 className="text-2xl font-semibold text-neutral-900">Scan</h1>
           <p className="mt-1 text-sm text-neutral-500">
-            Scans the configured root directory for HTML files and scores each one.
+            Crawls the configured base URL for pages and scores each one.
           </p>
         </div>
         <RunScanButton />
@@ -31,7 +31,7 @@ export default async function ScanPage() {
       {latestRun && (
         <div className="mt-8">
           <h2 className="text-base font-semibold text-neutral-900">
-            Latest scan — {latestRun.rootDir}
+            Latest scan — {latestRun.baseUrl}
           </h2>
           <p className="mt-1 text-sm text-neutral-500">
             {latestRun.pageCount} page{latestRun.pageCount === 1 ? "" : "s"} · avg SEO{" "}
@@ -76,7 +76,7 @@ export default async function ScanPage() {
                 {latestPages.length === 0 && (
                   <tr>
                     <td colSpan={3} className="px-4 py-6 text-center text-neutral-500">
-                      No HTML files found in the root directory.
+                      No pages found when crawling this URL.
                     </td>
                   </tr>
                 )}

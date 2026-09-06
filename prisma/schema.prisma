@@ -24,11 +24,11 @@ model User {
   createdAt    DateTime @default(now())
 }
 
-// One run of scanning `Setting.scanRootDir` (or an overridden path) for
-// static HTML files and scoring each one for SEO/GEO quality.
+// One run of crawling `Setting.scanBaseUrl` (or an overridden URL) over
+// HTTP and scoring each reachable page for SEO/GEO quality.
 model ScanRun {
   id          String     @id @default(cuid())
-  rootDir     String
+  baseUrl     String
   startedAt   DateTime   @default(now())
   finishedAt  DateTime?
   pageCount   Int        @default(0)
@@ -37,15 +37,15 @@ model ScanRun {
   pages       PageScan[]
 }
 
-// One HTML file's extracted signals, checklist, and scores from a ScanRun.
+// One crawled page's extracted signals, checklist, and scores from a ScanRun.
 model PageScan {
   id        String  @id @default(cuid())
   scanRunId String
   scanRun   ScanRun @relation(fields: [scanRunId], references: [id], onDelete: Cascade)
 
-  filePath String
-  urlPath  String
-  title    String?
+  sourceUrl String
+  urlPath   String
+  title     String?
 
   seoScore Int
   geoScore Int
@@ -65,6 +65,6 @@ model PageScan {
 // Singleton site-wide configuration row.
 model Setting {
   id                      Int     @id @default(1)
-  scanRootDir             String  @default("")
+  scanBaseUrl             String  @default("")
   enableAiRecommendations Boolean @default(false)
 }
