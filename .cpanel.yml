@@ -37,9 +37,16 @@
 # fail within the same ~8 second window (the shortage outlasted a bare
 # retry), so each retry now waits 30s first to give the host a real chance
 # to free memory before trying again.
+#
+# npm ci is skipped whenever package-lock.json hasn't changed since the
+# last install: it hashes the lockfile and compares against a marker file
+# written into node_modules after a successful install, so a deploy whose
+# diff never touched dependencies (most deploys) doesn't pay npm ci's ~20s
+# clean-reinstall cost. Deleting node_modules (or its marker) always forces
+# a fresh install regardless, so this can't skip installing when it matters.
 deployment:
   tasks:
-    - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npm ci --include=dev --ignore-scripts
+    - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && LOCK_HASH=$(sha256sum package-lock.json | awk '{print $1}') && if [ -f node_modules/.install-hash ] && [ "$(cat node_modules/.install-hash)" = "$LOCK_HASH" ]; then echo "package-lock.json unchanged; skipping npm ci"; else npm ci --include=dev --ignore-scripts && echo "$LOCK_HASH" > node_modules/.install-hash; fi
     - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npx prisma generate --schema=/home/gotka7/cms.gotka.com/prisma/schema.prisma
     - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && npx prisma migrate deploy --schema=/home/gotka7/cms.gotka.com/prisma/schema.prisma
     - source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && NODE_OPTIONS="--max-old-space-size=2048" npm run build || (sleep 30 && source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && NODE_OPTIONS="--max-old-space-size=2048" npm run build) || (sleep 30 && source /home/gotka7/nodevenv/cms.gotka.com/24/bin/activate && cd /home/gotka7/cms.gotka.com && NODE_OPTIONS="--max-old-space-size=2048" npm run build)
