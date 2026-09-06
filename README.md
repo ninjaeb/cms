@@ -1,23 +1,24 @@
 # SEO/GEO Scanner
 
-An admin tool that scans a `public_html`-style directory of static HTML files
-and scores each page for both **traditional SEO** (search engines) and
-**GEO** (Generative Engine Optimization — being accurately understood,
-summarized, and cited by AI answer engines like ChatGPT, Claude, and
-Perplexity), then generates rule-based and AI-written recommendations.
+An admin tool that crawls a site starting from a public URL and scores each
+reachable page for both **traditional SEO** (search engines) and **GEO**
+(Generative Engine Optimization — being accurately understood, summarized,
+and cited by AI answer engines like ChatGPT, Claude, and Perplexity), then
+generates rule-based and AI-written recommendations.
 
-This does not manage or publish content — it reads and audits HTML that
-already exists on disk.
+This does not manage or publish content — it crawls and audits a live site
+over HTTP.
 
 Built with Next.js (App Router), Prisma + PostgreSQL, and Tailwind CSS.
 
 ## Features
 
-- **Scan** a configured root directory for `*.html`/`*.htm` files
-  (`src/lib/htmlScan.ts`), extracting title/meta description/canonical,
-  heading structure, image alt-text coverage, JSON-LD structured data
-  (`Article`/`BlogPosting`, `FAQPage`, `BreadcrumbList`), and freshness/
-  citation/summary heuristics.
+- **Crawl** a site starting from a configured base URL, following
+  same-origin links breadth-first (`src/lib/htmlScan.ts`), extracting title/
+  meta description/canonical, heading structure, image alt-text coverage,
+  JSON-LD structured data (`Article`/`BlogPosting`, `FAQPage`,
+  `BreadcrumbList`), and freshness/citation/summary heuristics from each
+  fetched page.
 - **Score** each page against an SEO checklist and a GEO checklist
   (`src/lib/seo.ts`), each rendered as a pass/fail list with a percentage
   score.
@@ -47,8 +48,8 @@ npm run dev
 Open http://localhost:3000/admin to sign in (credentials printed by the seed
 script, default `admin@example.com` / `changeme123` — change
 `SEED_ADMIN_PASSWORD` in `.env` before seeding a real environment). Then in
-**Settings**, set the root directory to scan (e.g. `/home/youruser/public_html`)
-and run a scan from the **Scan** page.
+**Settings**, set the base URL to crawl (e.g. `https://example.com/`) and run
+a scan from the **Scan** page.
 
 AI-generated recommendations require `GEMINI_API_KEY` to be set; without
 it, the rule-based checklist still works, but the "Generate recommendation"
@@ -58,8 +59,8 @@ button will fail.
 
 - `prisma/schema.prisma` — data model (`User`, `Setting`, `ScanRun`,
   `PageScan`)
-- `src/lib/htmlScan.ts` — recursively finds and parses HTML files into a
-  normalized signals shape
+- `src/lib/htmlScan.ts` — crawls same-origin pages from a base URL and
+  parses each into a normalized signals shape
 - `src/lib/seo.ts` — the SEO/GEO checklist scoring logic
   (`computeChecklistFromPageSignals`)
 - `src/lib/aiRecommend.ts` — calls Gemini for page-specific recommendations
@@ -95,8 +96,9 @@ Prerequisites, done once in cPanel:
    SSH session with the nodevenv activated: `npx tsx prisma/seed.ts` (or set
    `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD` env vars first to avoid the
    default credentials).
-5. In the admin's **Settings** page, set the root directory to scan — e.g.
-   the account's actual `public_html` (`/home/gotka7/public_html`).
+5. In the admin's **Settings** page, set the base URL to crawl — e.g.
+   `https://cms.gotka.com/` or whichever public site this account should
+   audit.
 
 After that, every **Deploy HEAD Commit** runs `.cpanel.yml`'s tasks: install
 dependencies, apply pending migrations (`prisma migrate deploy`), build, and
@@ -111,5 +113,7 @@ cPanel's Node.js Selector is built on).
   Supabase, RDS, etc.).
 - `AUTH_SECRET` in `.env` must be replaced with a real random secret outside
   of local development (`openssl rand -base64 32`).
-- The scan root directory must be readable by the Node process running this
-  app (same filesystem, correct permissions) — it is not fetched over HTTP.
+- The crawl fetches pages over HTTP from wherever they're publicly served —
+  the target site does not need to be on the same server or filesystem as
+  this app. Only same-origin links are followed, and a crawl stops after
+  200 pages to bound cost/time.

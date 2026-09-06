@@ -1,11 +1,11 @@
-import { readdir, readFile } from "node:fs/promises";
-import path from "node:path";
 import * as cheerio from "cheerio";
 
-const SKIP_DIRS = new Set(["node_modules", ".git", "cgi-bin", ".well-known"]);
+const MAX_PAGES = 200;
+const FETCH_TIMEOUT_MS = 15000;
+const SKIP_EXTENSIONS = /\.(jpe?g|png|gif|webp|svg|ico|css|js|pdf|zip|xml|txt|woff2?|ttf|mp4|mp3)$/i;
 
 export type PageSignals = {
-  filePath: string;
+  sourceUrl: string;
   urlPath: string;
   title: string | null;
   metaDescription: string | null;
@@ -28,35 +28,86 @@ export type PageSignals = {
   citationsCount: number;
 };
 
-/** Recursively finds `*.html`/`*.htm` files under `rootDir`. */
-export async function findHtmlFiles(rootDir: string): Promise<string[]> {
-  const results: string[] = [];
+function normalizeUrl(url: string): string {
+  const u = new URL(url);
+  u.hash = "";
+  if (u.pathname !== "/" && u.pathname.endsWith("/")) u.pathname = u.pathname.slice(0, -1);
+  return u.toString();
+}
 
-  async function walk(dir: string) {
-    const entries = await readdir(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (entry.isDirectory()) {
-        if (SKIP_DIRS.has(entry.name)) continue;
-        await walk(path.join(dir, entry.name));
-      } else if (/\.html?$/i.test(entry.name)) {
-        results.push(path.join(dir, entry.name));
-      }
+async function fetchHtml(url: string): Promise<string | null> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { signal: controller.signal, redirect: "follow" });
+    if (!res.ok) return null;
+    const contentType = res.headers.get("content-type") ?? "";
+    if (!contentType.includes("html")) return null;
+    return await res.text();
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function extractSameOriginLinks($: cheerio.CheerioAPI, pageUrl: string, origin: string): string[] {
+  const links: string[] = [];
+  $("a[href]").each((_, el) => {
+    const href = $(el).attr("href");
+    if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) {
+      return;
+    }
+    try {
+      const resolved = new URL(href, pageUrl);
+      if (resolved.origin !== origin) return;
+      if (SKIP_EXTENSIONS.test(resolved.pathname)) return;
+      links.push(normalizeUrl(resolved.toString()));
+    } catch {
+      // Ignore unparseable hrefs.
+    }
+  });
+  return links;
+}
+
+/**
+ * Crawls a site starting from `startUrl`, following same-origin links
+ * breadth-first, and parses every reachable HTML page into signals for
+ * scoring. Stops at `MAX_PAGES` to bound crawl time/cost.
+ */
+export async function crawlSite(startUrl: string): Promise<PageSignals[]> {
+  const start = normalizeUrl(startUrl);
+  const origin = new URL(start).origin;
+
+  const visited = new Set<string>();
+  const queue: string[] = [start];
+  const pages: PageSignals[] = [];
+
+  while (queue.length > 0 && pages.length < MAX_PAGES) {
+    const url = queue.shift()!;
+    if (visited.has(url)) continue;
+    visited.add(url);
+
+    const html = await fetchHtml(url);
+    if (html === null) continue;
+
+    const $ = cheerio.load(html);
+    pages.push(parseSignalsFromDocument($, url));
+
+    for (const link of extractSameOriginLinks($, url, origin)) {
+      if (!visited.has(link) && !queue.includes(link)) queue.push(link);
     }
   }
 
-  await walk(rootDir);
-  return results;
+  return pages;
 }
 
-/** Derives a clean URL path from a file's location relative to `rootDir`. */
-function computeUrlPath(filePath: string, rootDir: string): string {
-  let rel = path.relative(rootDir, filePath).split(path.sep).join("/");
-  rel = rel.endsWith("index.html") || rel.endsWith("index.htm")
-    ? rel.slice(0, rel.lastIndexOf("index"))
-    : rel.replace(/\.html?$/i, "");
-  if (!rel.startsWith("/")) rel = `/${rel}`;
-  if (!rel.endsWith("/")) rel += "/";
-  return rel;
+/** Fetches and parses a single page by URL, used to re-score one page on demand. */
+export async function fetchAndParsePage(url: string): Promise<PageSignals> {
+  const html = await fetchHtml(url);
+  if (html === null) throw new Error(`Could not fetch or parse ${url} (non-OK response or non-HTML content).`);
+  const $ = cheerio.load(html);
+  return parseSignalsFromDocument($, url);
 }
 
 function collectJsonLd($: cheerio.CheerioAPI): Record<string, unknown>[] {
@@ -100,10 +151,7 @@ function countCitations($: cheerio.CheerioAPI): number {
   return count;
 }
 
-/** Reads and parses one HTML file into a normalized signals shape for scoring. */
-export async function parsePage(filePath: string, rootDir: string): Promise<PageSignals> {
-  const html = await readFile(filePath, "utf-8");
-  const $ = cheerio.load(html);
+function parseSignalsFromDocument($: cheerio.CheerioAPI, pageUrl: string): PageSignals {
   $("script, style, noscript").remove();
 
   const robotsMeta = $('meta[name="robots"]').attr("content")?.toLowerCase() ?? "";
@@ -120,8 +168,8 @@ export async function parsePage(filePath: string, rootDir: string): Promise<Page
   const leadParagraphText = $("main p, article p, body p").first().text().trim();
 
   return {
-    filePath,
-    urlPath: computeUrlPath(filePath, rootDir),
+    sourceUrl: pageUrl,
+    urlPath: new URL(pageUrl).pathname || "/",
     title: $("title").first().text().trim() || null,
     metaDescription: $('meta[name="description"]').attr("content")?.trim() || null,
     canonical: $('link[rel="canonical"]').attr("href")?.trim() || null,

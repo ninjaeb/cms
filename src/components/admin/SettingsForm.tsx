@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Settings = {
-  scanRootDir: string;
+  scanBaseUrl: string;
   enableAiRecommendations: boolean;
 };
 
@@ -45,14 +45,14 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
         <h2 className="text-base font-semibold text-neutral-900">Scan</h2>
         <div className="mt-4 space-y-4">
           <F
-            label="Root directory"
-            hint="Absolute path to the public_html-style directory to scan for HTML files (must be readable by the Node process)."
+            label="Base URL"
+            hint="The public URL to start crawling from — e.g. your site's homepage. Same-origin links found on each page are followed automatically."
           >
             <input
-              value={form.scanRootDir}
-              onChange={(e) => update("scanRootDir", e.target.value)}
+              value={form.scanBaseUrl}
+              onChange={(e) => update("scanBaseUrl", e.target.value)}
               className="input font-mono text-sm"
-              placeholder="/home/youraccount/public_html"
+              placeholder="https://example.com/"
             />
           </F>
           <label className="flex items-center gap-2 text-sm text-neutral-700">

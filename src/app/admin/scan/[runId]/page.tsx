@@ -16,7 +16,7 @@ export default async function ScanRunPage({ params }: { params: Promise<{ runId:
       <Link href="/admin/scan" className="text-sm text-neutral-500 hover:underline">
         ← Back to scans
       </Link>
-      <h1 className="mt-2 text-2xl font-semibold text-neutral-900">Scan — {run.rootDir}</h1>
+      <h1 className="mt-2 text-2xl font-semibold text-neutral-900">Scan — {run.baseUrl}</h1>
       <p className="mt-1 text-sm text-neutral-500">
         {run.startedAt.toLocaleString()} · {run.pageCount} page{run.pageCount === 1 ? "" : "s"} ·
         avg SEO {run.avgSeoScore ?? "—"}% · avg GEO {run.avgGeoScore ?? "—"}%
@@ -60,7 +60,7 @@ export default async function ScanRunPage({ params }: { params: Promise<{ runId:
             {run.pages.length === 0 && (
               <tr>
                 <td colSpan={3} className="px-4 py-6 text-center text-neutral-500">
-                  No HTML files found in the root directory.
+                  No pages found when crawling this URL.
                 </td>
               </tr>
             )}
